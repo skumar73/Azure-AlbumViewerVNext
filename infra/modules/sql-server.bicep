@@ -35,6 +35,17 @@ resource sqlFirewallRule 'Microsoft.Sql/servers/firewallRules@2023-05-01-preview
   }
 }
 
+// Allow all external connections for development/testing
+// In production, you should restrict this to specific IP ranges
+resource sqlFirewallRuleAllowAll 'Microsoft.Sql/servers/firewallRules@2023-05-01-preview' = {
+  parent: sqlServer
+  name: 'AllowAllIPs'
+  properties: {
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '255.255.255.255'
+  }
+}
+
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-05-01-preview' = {
   parent: sqlServer
   name: sqlDatabaseName
