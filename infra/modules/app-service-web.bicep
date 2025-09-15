@@ -21,7 +21,7 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
     serverFarmId: appServicePlanId
     httpsOnly: true
     siteConfig: {
-      netFrameworkVersion: 'v8.0'
+      appCommandLine: ''
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       scmMinTlsVersion: '1.2'
@@ -54,7 +54,7 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '18.19.0'
+          value: '16.20.0'
         }
         {
           name: 'ASPNETCORE_ENVIRONMENT'
@@ -63,10 +63,6 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'false'
-        }
-        {
-          name: 'WEBSITE_STARTUP_COMMAND'
-          value: 'node generate-env.js'
         }
       ]
       httpLoggingEnabled: true
