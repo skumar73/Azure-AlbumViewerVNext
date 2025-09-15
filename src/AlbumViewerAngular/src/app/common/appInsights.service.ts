@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
 import { ApplicationInsights } from "@microsoft/applicationinsights-web";
-import { env } from "process";
 
 @Injectable({
     providedIn: "root",
