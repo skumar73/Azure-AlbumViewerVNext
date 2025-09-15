@@ -12,7 +12,7 @@ namespace AlbumViewerBusiness
     /// wwwroot/data/albums.js file which contains all the data
     /// in a single graph.
     /// </summary>
-    public  class AlbumViewerDataImporter
+    public class AlbumViewerDataImporter
     {
         public static bool EnsureAlbumData(AlbumViewerContext context, string jsonDataFilePath)
         {
@@ -20,7 +20,7 @@ namespace AlbumViewerBusiness
             {
                 // Ensure database and tables exist first
                 context.Database.EnsureCreated();
-                
+
                 // Check if we already have data
                 if (!context.Albums.Any())
                 {
@@ -30,7 +30,7 @@ namespace AlbumViewerBusiness
                         Console.WriteLine($"ERROR: Albums data file not found at: {jsonDataFilePath}");
                         return false;
                     }
-                    
+
                     string json = System.IO.File.ReadAllText(jsonDataFilePath);
                     Console.WriteLine($"Read {json.Length} characters from albums.js");
                     return ImportFromJson(context, json) > 0;
@@ -99,7 +99,7 @@ namespace AlbumViewerBusiness
             {
                 Username = "test",
                 Password = "test",
-                Fullname = "Test User",                               
+                Fullname = "Test User",
             };
             context.Users.Add(user);
             context.SaveChanges();
