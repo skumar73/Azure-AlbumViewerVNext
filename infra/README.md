@@ -2,6 +2,8 @@
 
 This folder contains Bicep templates for deploying the AlbumViewer application infrastructure to Azure.
 
+> **Status**: Testing Azure credentials for GitHub Actions deployment
+
 ## Architecture
 
 The infrastructure consists of:
