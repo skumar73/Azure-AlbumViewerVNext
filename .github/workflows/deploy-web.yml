@@ -56,12 +56,12 @@ jobs:
         run: |
           cd ${{ env.WEB_PROJECT_PATH }}
           npm run build -- --configuration=production
-          
+
           # Copy environment generation files to dist folder
           cp src/generate-env.js dist/
           cp src/env.js.template dist/
           cp src/web.config dist/
-          
+
           echo "Build completed. Contents of dist folder:"
           ls -la dist/
 

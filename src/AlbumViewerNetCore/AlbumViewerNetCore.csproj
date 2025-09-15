@@ -45,9 +45,6 @@
       <Content Include="albums.js">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="AlbumViewerData.sqlite">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
     </ItemGroup>
   
 </Project>

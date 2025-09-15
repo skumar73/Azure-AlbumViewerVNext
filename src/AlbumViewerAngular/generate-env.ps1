@@ -15,7 +15,8 @@ try {
     if (Test-Path $SourcePath) {
         $template = Get-Content $SourcePath -Raw
         Write-Host "Template file found and loaded"
-    } else {
+    }
+    else {
         Write-Host "Template file not found at: $SourcePath"
         # Create a basic template if not found
         $template = @"
@@ -34,7 +35,8 @@ try {
     if (-not $apiUrl) {
         $apiUrl = "https://api-placeholder.azurewebsites.net"
         Write-Host "API_URL not found, using placeholder: $apiUrl"
-    } else {
+    }
+    else {
         Write-Host "API_URL found: $apiUrl"
     }
 
@@ -42,7 +44,8 @@ try {
     if (-not $appInsightsConnectionString) {
         $appInsightsConnectionString = ""
         Write-Host "APPLICATIONINSIGHTS_CONNECTION_STRING not found"
-    } else {
+    }
+    else {
         Write-Host "APPLICATIONINSIGHTS_CONNECTION_STRING found: $($appInsightsConnectionString.Substring(0, [Math]::Min(50, $appInsightsConnectionString.Length)))..."
     }
 
@@ -50,7 +53,8 @@ try {
     if (-not $environment) {
         $environment = "production"
         Write-Host "ASPNETCORE_ENVIRONMENT not found, using: $environment"
-    } else {
+    }
+    else {
         Write-Host "ASPNETCORE_ENVIRONMENT found: $environment"
     }
 
@@ -68,12 +72,14 @@ try {
     if (Test-Path $TargetPath) {
         $fileSize = (Get-Item $TargetPath).Length
         Write-Host "File created successfully. Size: $fileSize bytes"
-    } else {
+    }
+    else {
         Write-Host "ERROR: File was not created successfully"
         exit 1
     }
 
-} catch {
+}
+catch {
     Write-Host "ERROR generating env.js: $($_.Exception.Message)"
     Write-Host "Stack trace: $($_.ScriptStackTrace)"
     exit 1

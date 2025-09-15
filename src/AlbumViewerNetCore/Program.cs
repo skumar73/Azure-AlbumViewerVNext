@@ -119,7 +119,7 @@ services.AddAuthentication(options => // JwtBearerDefaults.AuthenticationScheme)
 // https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
 var aiOptions = new ApplicationInsightsServiceOptions();
 aiOptions.DeveloperMode = false;
-aiOptions.EnableAdaptiveSampling = false;            
+aiOptions.EnableAdaptiveSampling = false;
 services.AddApplicationInsightsTelemetry(aiOptions);
 services.AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>();
 
