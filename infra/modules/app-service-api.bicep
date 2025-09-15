@@ -60,6 +60,10 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
           name: 'Data__SqlServerConnectionString'
           value: sqlConnectionString
         }
+        {
+          name: 'Data__useSqLite'
+          value: 'false'
+        }
       ]
       httpLoggingEnabled: true
       logsDirectorySizeLimit: 35

@@ -19,22 +19,52 @@ namespace AlbumViewerBusiness
             bool hasData = false;
             try
             {
+                Console.WriteLine($"Checking if Albums table has data...");
                 hasData = context.Albums.Any();
+                Console.WriteLine($"Albums table has data: {hasData}");
             }
-            catch
+            catch (Exception ex)
             {
-                context.Database.EnsureCreated(); // just create the schema - no migrations
-                hasData = context.Albums.Any();
+                Console.WriteLine($"Error checking Albums table, creating database schema: {ex.Message}");
+                try
+                {
+                    context.Database.EnsureCreated(); // just create the schema - no migrations
+                    Console.WriteLine("Database schema created successfully");
+                    hasData = context.Albums.Any();
+                    Console.WriteLine($"Albums table has data after schema creation: {hasData}");
+                }
+                catch (Exception createEx)
+                {
+                    Console.WriteLine($"Error creating database schema: {createEx.Message}");
+                    throw;
+                }
             }
-
 
             if (!hasData)
             {
-                string json = System.IO.File.ReadAllText(jsonDataFilePath);
-                return ImportFromJson(context, json) > 0;
+                Console.WriteLine($"No data found, importing from: {jsonDataFilePath}");
+                if (!System.IO.File.Exists(jsonDataFilePath))
+                {
+                    Console.WriteLine($"ERROR: Albums data file not found at: {jsonDataFilePath}");
+                    return false;
+                }
+                
+                try
+                {
+                    string json = System.IO.File.ReadAllText(jsonDataFilePath);
+                    Console.WriteLine($"Read {json.Length} characters from albums.js");
+                    var result = ImportFromJson(context, json) > 0;
+                    Console.WriteLine($"Import result: {result}");
+                    return result;
+                }
+                catch (Exception importEx)
+                {
+                    Console.WriteLine($"Error importing album data: {importEx.Message}");
+                    throw;
+                }
             }
 
-
+            Console.WriteLine("Database already has data, skipping import");
             return true;
         }
 
