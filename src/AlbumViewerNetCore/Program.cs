@@ -309,6 +309,7 @@ Console.WriteLine("Hosting Environment: " + environment.EnvironmentName);
 string useSqLite = configuration["Data:useSqLite"];
 Console.WriteLine(useSqLite == "true" ? "SQLite" : "SQL Server");
 
-
+// Test API deployment workflow
+Console.WriteLine("API ready for deployment to Azure App Service");
 
 app.Run();
