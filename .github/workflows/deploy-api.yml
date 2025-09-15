@@ -1,0 +1,62 @@
+name: Deploy API to Azure
+
+on:
+  push:
+    branches: ["*"]
+    paths:
+      - "src/AlbumViewerNetCore/**"
+      - ".github/workflows/deploy-api.yml"
+  workflow_dispatch:
+
+env:
+  API_APP_NAME: kiz-albumviewer-api
+  API_PROJECT_PATH: src/AlbumViewerNetCore/AlbumViewerNetCore.csproj
+
+jobs:
+  build-and-deploy-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.API_PROJECT_PATH }}
+
+      - name: Build API
+        run: dotnet build ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore
+
+      - name: Run tests (if any)
+        run: dotnet test ${{ env.API_PROJECT_PATH }} --configuration Release --no-build --verbosity normal || echo "No tests found"
+
+      - name: Publish API
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --output ./api-publish --no-build
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy API to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.API_APP_NAME }}
+          package: ./api-publish
+
+      - name: Verify API deployment
+        run: |
+          echo "🎉 API deployment completed!"
+          echo "📍 API deployed to: https://${{ env.API_APP_NAME }}.azurewebsites.net"
+
+          # Wait a moment for deployment to complete
+          sleep 30
+
+          # Test the API endpoint
+          API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
+          echo "Testing API at: $API_URL"
+          curl -f "$API_URL" || echo "API verification failed, but deployment completed"

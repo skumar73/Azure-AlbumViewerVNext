@@ -1,11 +1,5 @@
 using AlbumViewerBusiness;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections;
-using System.IO;
-using System.Text;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 
 
@@ -33,6 +34,8 @@ namespace AlbumViewerAspNetCore
 
         private IWebHostEnvironment HostingEnv;
 
+        private readonly TelemetryClient _telemetryClient;
+
         public AlbumViewerApiController(
             AlbumViewerContext ctx, 
             IServiceProvider svcProvider,
@@ -40,7 +43,8 @@ namespace AlbumViewerAspNetCore
             AlbumRepository albumRepo, 
             IConfiguration config,
             ILogger<AlbumViewerApiController> logger,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            TelemetryClient telemetryClient)
         {
             context = ctx;
             serviceProvider = svcProvider;
@@ -51,6 +55,8 @@ namespace AlbumViewerAspNetCore
             Logger = logger;
 
             HostingEnv = env;
+
+            _telemetryClient = telemetryClient;
         }
 
 
@@ -238,7 +244,7 @@ namespace AlbumViewerAspNetCore
             if (string.IsNullOrEmpty(search))
                 return new List<object>();
 
-            var repo = new ArtistRepository(context);
+            var repo = new ArtistRepository(context, _telemetryClient);
             var term = search.ToLower();
             return await repo.ArtistLookup(term);
         }

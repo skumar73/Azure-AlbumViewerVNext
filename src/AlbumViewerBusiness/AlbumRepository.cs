@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Westwind.BusinessObjects;
@@ -13,9 +14,14 @@ namespace AlbumViewerBusiness
 {
     public class AlbumRepository : EntityFrameworkRepository<AlbumViewerContext, Album>
     {
-        public AlbumRepository(AlbumViewerContext context)
+        private readonly TelemetryClient _telemetryClient;
+
+        public AlbumRepository(AlbumViewerContext context,
+            TelemetryClient telemetryClient)
             : base(context)
-        { }
+        {
+            _telemetryClient = telemetryClient;
+        }
 
         protected override void OnAfterCreated(Album entity)
         {
@@ -160,6 +166,11 @@ namespace AlbumViewerBusiness
             if (!await SaveAsync())
                 return null;
 
+            var properties = new Dictionary<string, string>
+            {
+                { "Album title", album.Title }
+            };
+            _telemetryClient.TrackEvent("Album updated", properties);
             return album;
         }
 
@@ -196,6 +207,10 @@ namespace AlbumViewerBusiness
 
                 return result;
             }
+
+            var properties = new Dictionary<string, string>();
+            properties.Add("Album title", album.Title);
+            _telemetryClient.TrackEvent("Album deleted", properties);
 
             return true;
         }

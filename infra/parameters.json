@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroupName": {
+      "value": "kiz-albumviewer-rg"
+    },
+    "location": {
+      "value": "eastus2"
+    },
+    "environment": {
+      "value": "prod"
+    },
+    "appServicePlanName": {
+      "value": "kiz-albumviewer-plan"
+    },
+    "apiAppName": {
+      "value": "kiz-albumviewer-api"
+    },
+    "webAppName": {
+      "value": "kiz-albumviewer-web"
+    },
+    "sqlServerName": {
+      "value": "kiz-albumviewer-sql"
+    },
+    "sqlDatabaseName": {
+      "value": "kiz-albumviewer-db"
+    },
+    "applicationInsightsName": {
+      "value": "kiz-albumviewer-insights"
+    },
+    "logAnalyticsWorkspaceName": {
+      "value": "kiz-albumviewer-logs"
+    },
+    "sqlAdminUsername": {
+      "value": "albumadmin"
+    },
+    "sqlAdminPassword": {
+      "value": "AlbumDemo123!"
+    }
+  }
+}

@@ -6,54 +6,75 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {ErrorInfo} from "../common/errorDisplay";
 import {AppConfiguration} from "../business/appConfiguration";
 import {slideIn, slideInLeft} from "../common/animations";
+import { AppInsightsService } from '../common/appInsights.service';
 
 @Component({
-    selector: 'album-display',
-    templateUrl: './albumDisplay.html',
-    animations: [ slideIn ]
+    selector: "album-display",
+    templateUrl: "./albumDisplay.html",
+    animations: [slideIn],
 })
 export class AlbumDisplay implements OnInit {
+    @Input() album: Album = new Album();
+    error = new ErrorInfo();
+    aniFrame = "in";
 
-  @Input() album:Album = new Album();
-  error = new ErrorInfo();
-  aniFrame = 'in';
+    constructor(
+        private route: ActivatedRoute,
+        private router: Router,
+        private config: AppConfiguration,
+        private albumService: AlbumService,
+        private appInsights: AppInsightsService
+    ) {}
 
-  constructor(private route: ActivatedRoute,
-              private router: Router,
-              private config: AppConfiguration,
-              private albumService: AlbumService) {
-  }
+    ngOnInit() {
+        this.config.isSearchAllowed = false;
+        this.config.activeTab = "albums";
+        this.aniFrame = "in";
 
-  ngOnInit() {
-    this.config.isSearchAllowed = false;
-    this.config.activeTab = "albums";
-    this.aniFrame = 'in';
+        //console.log("AlbumDisplay");
+        if (!this.album.Title) {
+            var id = this.route.snapshot.params["id"];
+            if (id < 1) return;
 
-    //console.log("AlbumDisplay");
-    if(!this.album.Title) {
-      var id = this.route.snapshot.params["id"];
-      if (id < 1)
-        return;
-
-      this.albumService.getAlbum(id)
-        .subscribe( result => {
-          this.album = result;
-        }, err => this.error.error(err));
+            this.albumService.getAlbum(id).subscribe(
+                (result) => {
+                    this.album = result;
+                },
+                (err) => this.error.error(err)
+            );
+        }
     }
-  }
 
-  ngOnDestroy() {
-    this.aniFrame = 'out';
-    console.log("ngDestroy")
-  }
+    ngOnDestroy() {
+        this.aniFrame = "out";
+        console.log("ngDestroy");
+    }
 
-  deleteAlbum(album) {
-    this.albumService.deleteAlbum(album)
-      .subscribe( result =>{
-        this.error.info("Album '"  + album.Title + "' has been deleted.");
-        setTimeout(() => this.router.navigate(["/albums"]), 1500);          
-      },
-      (err)=> this.error.error(err));
-  }
+    deleteAlbum(album) {
+        this.albumService.deleteAlbum(album).subscribe(
+            (result) => {
+                this.error.info(
+                    "Album '" + album.Title + "' has been deleted."
+                );
+                setTimeout(() => this.router.navigate(["/albums"]), 1500);
+            },
+            (err) => this.error.error(err)
+        );
+    }
 
+    buyAlbum(album) {
+        this.appInsights.logEvent("Buy album", {
+            AlbumTitle: album.Title,
+            ArtistName: album.Artist.ArtistName,
+        });
+        window.location.href = album.AmazonUrl;
+    }
+
+    listenAlbum(album) {
+        this.appInsights.logEvent("Listen album", {
+            AlbumTitle: album.Title,
+            ArtistName: album.Artist.ArtistName,
+        });
+        window.location.href = album.SpotifyUrl;
+    }
 }

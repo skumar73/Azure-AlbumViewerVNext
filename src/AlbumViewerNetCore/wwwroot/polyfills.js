@@ -4126,7 +4126,7 @@ $export($export.S, 'Reflect', { get: get });
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\projects\AlbumViewerVNext\src\AlbumViewerAngular\src\polyfills.ts */"hN/g");
+module.exports = __webpack_require__(/*! C:\Users\makizhne\OneDrive - Microsoft\Projects\MIP\Azure-AlbumViewerVNext\src\AlbumViewerAngular\src\polyfills.ts */"hN/g");
 
 
 /***/ }),
@@ -4659,12 +4659,15 @@ module.exports = __webpack_require__(/*! ./_descriptors */ "nh4g") ? function (o
 /*!*********************************************************!*\
   !*** ./node_modules/@angular/localize/fesm2015/init.js ***!
   \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: $localize */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "$localize", function() { return _$localize; });
 /**
- * @license Angular v11.1.2
- * (c) 2010-2020 Google LLC. https://angular.io/
+ * @license Angular v11.2.14
+ * (c) 2010-2021 Google LLC. https://angular.io/
  * License: MIT
  */
 
@@ -4718,7 +4721,7 @@ var _global = __globalThis || __global || __window || __self;
  * ```
  *
  * This format is the same as that used for `i18n` markers in Angular templates. See the
- * [Angular 18n guide](guide/i18n#template-translations).
+ * [Angular 18n guide](guide/i18n#mark-text-for-translations).
  *
  * **Naming placeholders**
  *
@@ -4782,20 +4785,25 @@ var _global = __globalThis || __global || __window || __self;
  * the original template literal string without applying any translations to the parts. This
  * version is used during development or where there is no need to translate the localized
  * template literals.
+ *
  * @param messageParts a collection of the static parts of the template string.
  * @param expressions a collection of the values of each placeholder in the template string.
  * @returns the translated string, with the `messageParts` and `expressions` interleaved together.
+ *
+ * @globalApi
+ * @publicApi
  */
 
 
-var $localize = function $localize(messageParts) {
+var _$localize = function $localize(messageParts) {
   for (var _len = arguments.length, expressions = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     expressions[_key - 1] = arguments[_key];
   }
 
-  if ($localize.translate) {
+  if (_$localize.translate) {
     // Don't use array expansion here to avoid the compiler adding `__read()` helper unnecessarily.
-    var translation = $localize.translate(messageParts, expressions);
+    var translation = _$localize.translate(messageParts, expressions);
+
     messageParts = translation[0];
     expressions = translation[1];
   }
@@ -4873,7 +4881,8 @@ function findEndOfBlock(cooked, raw) {
 // Attach $localize to the global context, as a side-effect of this module.
 
 
-_global.$localize = $localize;
+_global.$localize = _$localize;
+
 
 /***/ }),
 
@@ -5313,7 +5322,6 @@ if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_localize_init__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/localize/init */ "N/DB");
-/* harmony import */ var _angular_localize_init__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_angular_localize_init__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var core_js_es6_reflect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/es6/reflect */ "VbrY");
 /* harmony import */ var core_js_es6_reflect__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_es6_reflect__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var zone_js_dist_zone__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! zone.js/dist/zone */ "0TWp");

@@ -7,12 +7,12 @@ import { map,catchError } from 'rxjs/operators';
 
 
 import {ErrorInfo, ErrorDisplay} from "../common/errorDisplay";
+import { AppInsightsService } from '../common/appInsights.service';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: "root",
 })
 export class UserInfo {
-
     isAdmin = false;
     userName: string = null;
     sessionStarted = new Date();
@@ -24,35 +24,33 @@ export class UserInfo {
         this._isAuthenticated = val || false;
         // cache authentication
         if (this._isAuthenticated)
-            localStorage.setItem('av_token', this._token);
-        else
-            localStorage.removeItem('av_token');
+            localStorage.setItem("av_token", this._token);
+        else localStorage.removeItem("av_token");
     }
     get isAuthenticated() {
         return this._isAuthenticated;
-    };
-
+    }
 
     private _token = "";
-    get token() { 
-        return this._token
+    get token() {
+        return this._token;
     }
     set token(value) {
         this._token = value;
-        localStorage.setItem('av_token',value);
+        localStorage.setItem("av_token", value);
     }
 
-
-    constructor(private http: HttpClient,
-                private config: AppConfiguration) {
+    constructor(
+        private http: HttpClient,
+        private config: AppConfiguration,
+        private appInsights: AppInsightsService
+    ) {
         // initialize isAuthenticate from localstorage
-        let token  = localStorage.getItem("av_token");
-        if(token)
-        {
+        let token = localStorage.getItem("av_token");
+        if (token) {
             this._isAuthenticated = true;
-            this.token = token; 
-        }
-        else{
+            this.token = token;
+        } else {
             this._isAuthenticated = false;
             this.token = null;
         }
@@ -62,49 +60,66 @@ export class UserInfo {
         Cookie Auth
      */
     login(username, password) {
-        return this.http.post(this.config.urls.url("login"), {
-            username: username,
-            password: password
-        },this.config.requestHeaders)
-        .pipe(catchError((response) => {
-                if (response.status === 401)
-                    this.isAuthenticated = false;
+        return this.http
+            .post(
+                this.config.urls.url("login"),
+                {
+                    username: username,
+                    password: password,
+                },
+                this.config.requestHeaders
+            )
+            .pipe(
+                catchError((response) => {
+                    if (response.status === 401) this.isAuthenticated = false;
 
-                return new ErrorInfo().parseObservableResponseError(response);
-            }));
+                    return new ErrorInfo().parseObservableResponseError(
+                        response
+                    );
+                })
+            );
     }
 
     /*
         Token Auth
     */
     authenticate(username, password) {
-        return this.http.post<TokenInfo>(this.config.urls.url("authenticate"), {
-            username: username,
-            password: password
-        },this.config.requestHeaders)
+        return this.http
+            .post<TokenInfo>(
+                this.config.urls.url("authenticate"),
+                {
+                    username: username,
+                    password: password,
+                },
+                this.config.requestHeaders
+            )
             .pipe(
-                map( (tokenInfo) => {
+                map((tokenInfo) => {
                     this.token = tokenInfo.token;
                     this.expires = new Date(tokenInfo.expires);
+                    this.appInsights.setUserContext(username);
                     return true;
                 }),
                 catchError((response) => {
-                if (response.status === 401)
-                    this.isAuthenticated = false;
-
-                return new ErrorInfo().parseObservableResponseError(response);
-            }));
+                    if (response.status === 401) {
+                        this.isAuthenticated = false;
+                        this.appInsights.clearUserContext();
+                    }
+                    return new ErrorInfo().parseObservableResponseError(
+                        response
+                    );
+                })
+            );
     }
 
     logout() {
-        return this.http.get<boolean>(this.config.urls.url("logout"))
-            .pipe(
-                map(
-                    (success) => {
-                        this.isAuthenticated = false;
-                        return true;
-                    }
-                ));
+        return this.http.get<boolean>(this.config.urls.url("logout")).pipe(
+            map((success) => {
+                this.isAuthenticated = false;
+                this.appInsights.clearUserContext();
+                return true;
+            })
+        );
     }
 
     /**
@@ -115,18 +130,19 @@ export class UserInfo {
     checkAuthentication() {
         const url = this.config.urls.url("isAuthenticated");
         console.log(url);
-        return this.http.get<boolean>(url)
-            .pipe(
-                map((result) => {
-                    this.isAuthenticated = result;
-                    return result;
-                }),
-                catchError((response) => {                    
-                    this.isAuthenticated = false;                    
-                    var err = new ErrorInfo().parseObservableResponseError(response)
-                    return throwError(err);
-                })
-            );
+        return this.http.get<boolean>(url).pipe(
+            map((result) => {
+                this.isAuthenticated = result;
+                return result;
+            }),
+            catchError((response) => {
+                this.isAuthenticated = false;
+                var err = new ErrorInfo().parseObservableResponseError(
+                    response
+                );
+                return throwError(err);
+            })
+        );
     }
 }
 

@@ -19,6 +19,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.ApplicationInsights.Extensibility;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -80,12 +82,12 @@ services.AddAuthentication(options => // JwtBearerDefaults.AuthenticationScheme)
         options.DefaultScheme = "JWT_OR_COOKIE";
         options.DefaultChallengeScheme = "JWT_OR_COOKIE";
     })
-    .AddCookie( options =>
+    .AddCookie(options =>
     {
         options.LoginPath = "/login";
         options.ExpireTimeSpan = TimeSpan.FromDays(1);
     })
-    .AddJwtBearer( options =>
+    .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -112,6 +114,14 @@ services.AddAuthentication(options => // JwtBearerDefaults.AuthenticationScheme)
             return CookieAuthenticationDefaults.AuthenticationScheme;
         };
     });
+
+
+// https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
+var aiOptions = new ApplicationInsightsServiceOptions();
+aiOptions.DeveloperMode = false;
+aiOptions.EnableAdaptiveSampling = false;            
+services.AddApplicationInsightsTelemetry(aiOptions);
+services.AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>();
 
 // Instance injection
 services.AddScoped<AlbumRepository>();
@@ -170,7 +180,7 @@ var app = builder.Build();
 // Get any injected items
 var albumContext = app.Services.CreateScope().ServiceProvider.GetService<AlbumViewerContext>();
 
-    
+
 
 //Log.Logger = new LoggerConfiguration()
 //        .WriteTo.RollingFile(pathFormat: "logs\\log-{Date}.log")
@@ -199,20 +209,20 @@ else
                 await context.Response.WriteAsync(
                         "We're sorry, we encountered an un-expected issue with your application.<br>\r\n");
 
-                            // Capture the exception
-                            var error = context.Features.Get<IExceptionHandlerFeature>();
+                // Capture the exception
+                var error = context.Features.Get<IExceptionHandlerFeature>();
                 if (error != null)
                 {
-                                // This error would not normally be exposed to the client
-                                await
-                        context.Response.WriteAsync("<br>Error: " +
-                                                    HtmlEncoder.Default.Encode(error.Error.Message) +
-                                                    "<br>\r\n");
+                    // This error would not normally be exposed to the client
+                    await
+            context.Response.WriteAsync("<br>Error: " +
+                                        HtmlEncoder.Default.Encode(error.Error.Message) +
+                                        "<br>\r\n");
                 }
                 await context.Response.WriteAsync("<br><a href=\"/\">Home</a><br>\r\n");
                 await context.Response.WriteAsync("</body></html>\r\n");
                 await context.Response.WriteAsync(new string(' ', 512)); // Padding for IE
-                        }));
+            }));
 }
 
 //app.UseHttpsRedirection();

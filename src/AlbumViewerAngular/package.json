@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node src/generate-env.js && ng serve",
     "build": "ng build",
     "build:prod": "ng build --prod --aot",
     "build:asp": "npm run build:prod & npm run clean & npm run copy",
@@ -12,7 +12,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "copy": "xcopy /s /q ./dist/*.*  ../AlbumViewerNetCore/wwwroot/",
-    "clean": "rd /s /q ../AlbumViewerNetCore/wwwroot/"
+    "clean": "rd /s /q ../AlbumViewerNetCore/wwwroot/",
+    "generate-env": "node src/generate-env.js"
   },
   "private": true,
   "dependencies": {
@@ -24,7 +25,8 @@
     "@angular/localize": "^11.1.2",
     "@angular/platform-browser": "^11.1.2",
     "@angular/platform-browser-dynamic": "^11.1.2",
-    "@angular/router": "^11.1.2",
+    "@angular/router": "^11.2.14",
+    "@microsoft/applicationinsights-web": "^2.8.12",
     "bootstrap": "^4.4.1",
     "core-js": "^2.5.4",
     "font-awesome": "^4.7.0",

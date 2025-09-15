@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.ApplicationInsights;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,15 @@ namespace AlbumViewerBusiness
 
     public class AccountRepository : EntityFrameworkRepository<AlbumViewerContext,User>
     {
-        public AccountRepository(AlbumViewerContext context)
+
+        private readonly TelemetryClient _telemetryClient;
+
+        public AccountRepository(AlbumViewerContext context,
+             TelemetryClient telemetryClient)
             : base(context)
-        { }
+        {
+            _telemetryClient = telemetryClient;
+        }
         
         public async Task<bool> Authenticate(string username, string password)
         {
@@ -28,8 +35,14 @@ namespace AlbumViewerBusiness
                             usr.Username == username && 
                             usr.Password == hashedPassword);
             if (user == null)
+            {
+                var properties = new Dictionary<string, string>();
+                properties.Add("Authentication for username", username);
+                _telemetryClient.TrackEvent("Authentication failed");
                 return false;
-            
+            }
+
+            _telemetryClient.TrackEvent("Authentication successful");
             return true;
         }
 

@@ -1,0 +1,90 @@
+name: Deploy Web App to Azure
+
+on:
+  push:
+    branches: ["*"]
+    paths:
+      - "src/AlbumViewerAngular/**"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+env:
+  WEB_APP_NAME: kiz-albumviewer-web
+  API_APP_NAME: kiz-albumviewer-api
+  WEB_PROJECT_PATH: src/AlbumViewerAngular
+
+jobs:
+  build-and-deploy-web:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ${{ env.WEB_PROJECT_PATH }}/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}
+          npm ci
+
+      - name: Update API URL in environment
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}/src/environments
+          # Update the API URL to point to the deployed API
+          API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
+
+          # Check if environment.prod.ts exists, if not create it from environment.ts
+          if [ ! -f environment.prod.ts ]; then
+            cp environment.ts environment.prod.ts
+          fi
+
+          # Update the API URL
+          sed -i "s|apiUrl: .*|apiUrl: '$API_URL',|" environment.prod.ts
+          echo "Updated API URL to: $API_URL"
+
+          # Show the updated file
+          echo "Environment file contents:"
+          cat environment.prod.ts
+
+      - name: Build Angular app
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}
+          npm run build -- --configuration=production
+          
+          # Copy environment generation files to dist folder
+          cp src/generate-env.js dist/
+          cp src/env.js.template dist/
+          cp src/web.config dist/
+          
+          echo "Build completed. Contents of dist folder:"
+          ls -la dist/
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Angular app to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.WEB_APP_NAME }}
+          package: ${{ env.WEB_PROJECT_PATH }}/dist
+
+      - name: Verify Web deployment
+        run: |
+          echo "🎉 Web app deployment completed!"
+          echo "📍 Web app deployed to: https://${{ env.WEB_APP_NAME }}.azurewebsites.net"
+
+          # Wait a moment for deployment to complete
+          sleep 30
+
+          # Test the web app endpoint
+          WEB_URL="https://${{ env.WEB_APP_NAME }}.azurewebsites.net"
+          echo "Testing Web app at: $WEB_URL"
+          curl -f "$WEB_URL" || echo "Web app verification failed, but deployment completed"

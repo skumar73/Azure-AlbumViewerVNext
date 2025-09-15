@@ -1,0 +1,45 @@
+name: Deploy Infrastructure to Azure
+
+on:
+  push:
+    branches: ["*"]
+    paths:
+      - "infra/**"
+      - ".github/workflows/deploy-infrastructure.yml"
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: kiz-albumviewer-rg
+  AZURE_LOCATION: eastus2
+
+jobs:
+  deploy-infrastructure:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Infrastructure
+        run: |
+          az deployment sub create \
+            --location ${{ env.AZURE_LOCATION }} \
+            --template-file infra/main.bicep \
+            --parameters @infra/parameters.json \
+            --query 'properties.outputs' \
+            --output json > outputs.json
+
+          # Extract and display outputs
+          API_URL=$(cat outputs.json | jq -r '.apiAppUrl.value')
+          WEB_URL=$(cat outputs.json | jq -r '.webAppUrl.value')
+          SQL_SERVER=$(cat outputs.json | jq -r '.sqlServerFqdn.value')
+
+          echo "🎉 Infrastructure deployed successfully!"
+          echo "📍 API URL: $API_URL"
+          echo "📍 Web URL: $WEB_URL"
+          echo "📍 SQL Server: $SQL_SERVER"

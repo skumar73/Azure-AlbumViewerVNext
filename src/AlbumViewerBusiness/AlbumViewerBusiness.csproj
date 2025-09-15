@@ -2,10 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>    
   </PropertyGroup>
-  <ItemGroup>
-    <!--<ProjectReference Include="..\Westwind.Utilities\Westwind.Utilities.csproj" />-->
-  </ItemGroup>
   <ItemGroup>    
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />    
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Westwind.Utilities" Version="4.0.20" />
   </ItemGroup>

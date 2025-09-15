@@ -3,9 +3,8 @@
     <div class="btn-group" role="group" style="margin-bottom: 10px;" aria-label="Album Navigation">
     <a routerLink="/albums" class="btn btn-sm btn-primary"><i class="fa fa-list"></i> Albums</a>
     <a [routerLink]="['/album/edit',album.Id]" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i> Edit</a>
-    <a [href]="album.AmazonUrl" class="btn btn-sm btn-primary"><i class="fa fa-dollar"></i> Buy</a>
-
-    <a [href]="album.SpotifyUrl" class="btn btn-sm btn-primary"><i class="fa fa-volume-up"></i> Listen</a>
+    <a (click)="buyAlbum(album)"  class="btn btn-sm btn-primary"><i class="fa fa-dollar"></i> Buy</a>
+    <a (click)="listenAlbum(album)" class="btn btn-sm btn-primary"><i class="fa fa-volume-up"></i> Listen</a>
     <button (click)="deleteAlbum(album)" class="btn btn-sm btn-primary"><i class="fa fa-remove"></i> Delete</button>
   </div>
 
@@ -30,9 +29,9 @@
       <div [innerHTML]="album.Description" class="line-breaks"></div>
 
       <div style="margin: 10px 0" class="pull-right">
-        &nbsp;
-        <a *ngIf="album.AmazonUrl" [href]="album.AmazonUrl" class="btn btn-link btn-sm" target="_amazon"><i class="fa fa-dollar"></i> Buy</a> &nbsp;&nbsp;
-        <a *ngIf="album.SpotifyUrl" [href]="album.SpotifyUrl" class="btn btn-link btn-sm" target="_spotify"><i class="fa fa-volume-up"></i> Play</a>
+        &nbsp;        
+        <a *ngIf="album.AmazonUrl" (click)="buyAlbum(album)" class="btn btn-link btn-sm" target="_amazon"><i class="fa fa-dollar"></i> Buy</a> &nbsp;&nbsp;
+        <a *ngIf="album.SpotifyUrl" (click)="listenAlbum(album)" class="btn btn-link btn-sm" target="_spotify"><i class="fa fa-volume-up"></i> Play</a>
       </div>
 
 

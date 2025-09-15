@@ -19,6 +19,9 @@ bower_components/
 .settings/
 *.sublime-workspace
 
+# local files
+local_settings.txt
+
 
 # Dotnet
 [Oo]bj/
