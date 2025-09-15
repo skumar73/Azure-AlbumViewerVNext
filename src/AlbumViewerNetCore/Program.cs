@@ -37,15 +37,7 @@ services.AddDbContext<AlbumViewerContext>(builder =>
     string useSqLite = configuration["Data:useSqLite"];
     if (useSqLite != "true")
     {
-        // First try to get connection string from Azure App Service connection strings
-        var connStr = configuration.GetConnectionString("DefaultConnection");
-        
-        // Fallback to app settings for local development
-        if (string.IsNullOrEmpty(connStr))
-        {
-            connStr = configuration["Data:SqlServerConnectionString"];
-        }
-        
+        var connStr = configuration["Data:SqlServerConnectionString"];
         builder.UseSqlServer(connStr, opt => opt.EnableRetryOnFailure());
     }
     else

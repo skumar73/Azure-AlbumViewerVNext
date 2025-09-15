@@ -56,6 +56,10 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
         }
+        {
+          name: 'Data:SqlServerConnectionString'
+          value: sqlConnectionString
+        }
       ]
       httpLoggingEnabled: true
       logsDirectorySizeLimit: 35
