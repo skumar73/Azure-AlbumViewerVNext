@@ -229,8 +229,9 @@ else
 
 
 app.UseStatusCodePages();
-app.UseDefaultFiles(); // so index.html is not required
-app.UseStaticFiles();
+// Removed static file serving - Angular app is now separate
+//app.UseDefaultFiles(); // so index.html is not required
+//app.UseStaticFiles();
 
 app.UseRouting();
 
@@ -277,20 +278,8 @@ if (true)  // (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// catch-all handler for HTML5 client routes - serve index.html
-app.Run(async context =>
-{
-    var path = context.Request.Path.Value;
-
-    // Make sure Angular output was created in wwwroot
-    // Running Angular in dev mode nukes output folder!
-    // so it could be missing.
-    if (environment.WebRootPath == null)
-        throw new InvalidOperationException("wwwroot folder doesn't exist. Please recompile your Angular Project before accessing index.html. API calls will work fine.");
-
-    context.Response.ContentType = "text/html";
-    await context.Response.SendFileAsync(Path.Combine(environment.WebRootPath, "index.html"));
-});
+// API-only server - Angular app is now separate
+// Removed catch-all handler that served index.html
 
 // Initialize Database if it doesn't exist
 var albumsPath = Path.Combine(environment.ContentRootPath, "albums.js");

@@ -7,12 +7,9 @@
         "start": "node src/generate-env.js && ng serve",
         "build": "ng build",
         "build:prod": "ng build --configuration=production --aot",
-        "build:asp": "npm run build:prod & npm run clean & npm run copy",
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
-        "copy": "xcopy /s /q ./dist/*.*  ../AlbumViewerNetCore/wwwroot/",
-        "clean": "rd /s /q ../AlbumViewerNetCore/wwwroot/",
         "generate-env": "node src/generate-env.js"
     },
     "private": true,
