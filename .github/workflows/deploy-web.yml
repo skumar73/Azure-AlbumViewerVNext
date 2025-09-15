@@ -56,6 +56,16 @@ jobs:
           echo "Build completed. Contents of dist folder:"
           ls -la dist/
 
+      - name: Create deployment package
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}
+          # Create a deployment folder with the contents that should go to wwwroot
+          mkdir -p deployment
+          cp -r dist/* deployment/
+          
+          echo "Deployment package contents:"
+          ls -la deployment/
+
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -65,7 +75,7 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.WEB_APP_NAME }}
-          package: ${{ env.WEB_PROJECT_PATH }}/dist
+          package: ${{ env.WEB_PROJECT_PATH }}/deployment
 
       - name: Verify Web deployment
         run: |

@@ -22,7 +22,6 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
     httpsOnly: true
     siteConfig: {
       appCommandLine: ''
-      nodeVersion: '16.20.0'
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       scmMinTlsVersion: '1.2'
@@ -52,10 +51,6 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
-        }
-        {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '16.20.0'
         }
         {
           name: 'ASPNETCORE_ENVIRONMENT'
