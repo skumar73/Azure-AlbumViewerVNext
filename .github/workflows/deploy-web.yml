@@ -33,25 +33,6 @@ jobs:
           cd ${{ env.WEB_PROJECT_PATH }}
           npm ci
 
-      - name: Update API URL in environment
-        run: |
-          cd ${{ env.WEB_PROJECT_PATH }}/src/environments
-          # Update the API URL to point to the deployed API
-          API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
-
-          # Check if environment.prod.ts exists, if not create it from environment.ts
-          if [ ! -f environment.prod.ts ]; then
-            cp environment.ts environment.prod.ts
-          fi
-
-          # Update the API URL
-          sed -i "s|apiUrl: .*|apiUrl: '$API_URL',|" environment.prod.ts
-          echo "Updated API URL to: $API_URL"
-
-          # Show the updated file
-          echo "Environment file contents:"
-          cat environment.prod.ts
-
       - name: Build Angular app
         run: |
           cd ${{ env.WEB_PROJECT_PATH }}
@@ -69,6 +50,17 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Configure App Service environment variables
+        run: |
+          # Set API_URL environment variable on the App Service
+          API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
+          echo "Setting API_URL to: $API_URL"
+          
+          az webapp config appsettings set \
+            --resource-group kiz-albumviewer-rg \
+            --name ${{ env.WEB_APP_NAME }} \
+            --settings API_URL="$API_URL"
 
       - name: Deploy Angular app to Azure App Service
         uses: azure/webapps-deploy@v2
