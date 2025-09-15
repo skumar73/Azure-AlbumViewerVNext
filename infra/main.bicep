@@ -74,22 +74,7 @@ module sqlServer 'modules/sql-server.bicep' = {
   }
 }
 
-// Deploy Web App Service (Angular frontend)
-module webAppService 'modules/app-service-web.bicep' = {
-  name: 'webAppService'
-  scope: rg
-  params: {
-    webAppName: webAppName
-    appServicePlanId: appServicePlan.outputs.appServicePlanId
-    location: location
-    environment: environment
-    applicationInsightsConnectionString: appInsights.outputs.applicationInsightsConnectionString
-    logAnalyticsWorkspaceId: logAnalytics.outputs.logAnalyticsWorkspaceId
-    apiAppUrl: 'https://${apiAppName}.azurewebsites.net'
-  }
-}
-
-// Deploy API App Service (ASP.NET Core API)
+// Deploy API App Service (ASP.NET Core API) - Create this FIRST
 module apiAppService 'modules/app-service-api.bicep' = {
   name: 'apiAppService'
   scope: rg
@@ -100,8 +85,23 @@ module apiAppService 'modules/app-service-api.bicep' = {
     environment: environment
     applicationInsightsConnectionString: appInsights.outputs.applicationInsightsConnectionString
     sqlConnectionString: 'Server=tcp:${sqlServer.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlDatabaseName};Persist Security Info=False;User ID=${sqlAdminUsername};Password=${sqlAdminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-    webAppUrl: webAppService.outputs.webAppUrl
+    webAppUrl: 'https://${webAppName}.azurewebsites.net' // Forward reference is OK here
     logAnalyticsWorkspaceId: logAnalytics.outputs.logAnalyticsWorkspaceId
+  }
+}
+
+// Deploy Web App Service (Angular frontend) - Create this AFTER API
+module webAppService 'modules/app-service-web.bicep' = {
+  name: 'webAppService'
+  scope: rg
+  params: {
+    webAppName: webAppName
+    appServicePlanId: appServicePlan.outputs.appServicePlanId
+    location: location
+    environment: environment
+    applicationInsightsConnectionString: appInsights.outputs.applicationInsightsConnectionString
+    logAnalyticsWorkspaceId: logAnalytics.outputs.logAnalyticsWorkspaceId
+    apiAppUrl: apiAppService.outputs.apiAppUrl // Now we can reference the actual API URL
   }
 }
 
