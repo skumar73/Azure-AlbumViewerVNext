@@ -41,7 +41,7 @@ jobs:
           # Generate env.js file with API URL
           API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
           echo "Generating env.js with API_URL: $API_URL"
-          
+
           # Create env.js file directly in dist folder
           cat > dist/env.js << EOF
           (function(window) {

@@ -22,6 +22,7 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
     httpsOnly: true
     siteConfig: {
       appCommandLine: ''
+      nodeVersion: '16.20.0'
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       scmMinTlsVersion: '1.2'
