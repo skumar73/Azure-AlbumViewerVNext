@@ -293,7 +293,13 @@ app.Run(async context =>
 });
 
 // Initialize Database if it doesn't exist
-AlbumViewerDataImporter.EnsureAlbumData(albumContext, Path.Combine(environment.ContentRootPath, "albums.js"));
+var albumsPath = Path.Combine(environment.ContentRootPath, "albums.js");
+Console.WriteLine($"Looking for albums.js at: {albumsPath}");
+Console.WriteLine($"File exists: {File.Exists(albumsPath)}");
+Console.WriteLine($"ContentRootPath: {environment.ContentRootPath}");
+Console.WriteLine($"WebRootPath: {environment.WebRootPath}");
+
+AlbumViewerDataImporter.EnsureAlbumData(albumContext, albumsPath);
 albumContext?.Dispose();
 
 
