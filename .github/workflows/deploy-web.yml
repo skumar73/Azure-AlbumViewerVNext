@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: "18"
           cache: "npm"
-          cache-dependency-path: ${{ env.WEB_PROJECT_PATH }}/package-lock.json
+          cache-dependency-path: "src/AlbumViewerAngular/package-lock.json"
 
       - name: Install dependencies
         run: |
