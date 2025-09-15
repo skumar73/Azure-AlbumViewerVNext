@@ -240,43 +240,23 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// check Swagger authentication
-app.Use(async (context, next) =>
-{
-    var path = context.Request.Path;
-    if (path.Value.Contains("/swagger/", StringComparison.OrdinalIgnoreCase))
-    {
-        if (!context.User.Identity.IsAuthenticated)
-        {
-            //context.Response.StatusCode = 401;
-            //await context.Response.WriteAsync("Unauthorized");
-            context.Response.Redirect("/login");
-            return;
-        }
-    }
+// Swagger is now publicly accessible for API-only service
+// Removed authentication check for Swagger
 
-    await next();
+// Map API controllers (modern syntax)
+app.MapControllers();
+
+// Add root endpoint to show this is an API-only service
+app.MapGet("/", () => new { 
+    Message = "AlbumViewer API", 
+    Version = "1.0", 
+    Documentation = "/swagger",
+    Endpoints = new[] { "/api/albums", "/api/artists", "/api/account" }
 });
 
-// don't use the new simpler syntax as it doesn't terminate
-// and always fires the catch-all route below
-// if you don't have a catch-all route then this syntax is preferrable
-// app.MapControllers();
-
-
-// endpoint handler terminates and allows for catch-all middleware below
-app.UseEndpoints(app =>
-{
-    app.MapControllers();
-});
-
-
-// for this app make it public
-if (true)  // (app.Environment.IsDevelopment()) 
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Make Swagger available in all environments for API-only service
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // API-only server - Angular app is now separate
 // Removed catch-all handler that served index.html
