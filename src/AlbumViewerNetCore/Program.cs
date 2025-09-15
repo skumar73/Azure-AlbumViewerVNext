@@ -307,7 +307,7 @@ Console.WriteLine("\r\nPlatform: " + System.Runtime.InteropServices.RuntimeInfor
 Console.WriteLine(".NET Version: " + System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);
 Console.WriteLine("Hosting Environment: " + environment.EnvironmentName);
 string useSqLite = configuration["Data:useSqLite"];
-Console.WriteLine(useSqLite == "true" ? "SqLite" : "Sql Server");
+Console.WriteLine(useSqLite == "true" ? "SQLite" : "SQL Server");
 
 
 
