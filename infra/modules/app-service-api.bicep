@@ -22,6 +22,7 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
     serverFarmId: appServicePlanId
     httpsOnly: true
     siteConfig: {
+      netFrameworkVersion: 'v8.0'
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       scmMinTlsVersion: '1.2'
