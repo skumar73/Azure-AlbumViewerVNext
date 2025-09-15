@@ -247,9 +247,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Add root endpoint to show this is an API-only service
-app.MapGet("/", () => new { 
-    Message = "AlbumViewer API", 
-    Version = "1.0", 
+app.MapGet("/", () => new
+{
+    Message = "AlbumViewer API",
+    Version = "1.0",
     Documentation = "/swagger",
     Endpoints = new[] { "/api/albums", "/api/artists", "/api/account" }
 });
