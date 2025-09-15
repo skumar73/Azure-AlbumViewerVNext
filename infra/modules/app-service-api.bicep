@@ -57,7 +57,7 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
           value: '1'
         }
         {
-          name: 'Data:SqlServerConnectionString'
+          name: 'Data__SqlServerConnectionString'
           value: sqlConnectionString
         }
       ]
