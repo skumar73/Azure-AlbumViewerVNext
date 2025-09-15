@@ -64,10 +64,6 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'false'
         }
-        {
-          name: 'WEBSITE_STARTUP_COMMAND'
-          value: 'node generate-env.js'
-        }
       ]
       httpLoggingEnabled: true
       logsDirectorySizeLimit: 35
@@ -75,6 +71,32 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
     }
     clientAffinityEnabled: false
     publicNetworkAccess: 'Enabled'
+  }
+}
+
+// Enable Application Logs
+resource webAppLogsConfig 'Microsoft.Web/sites/config@2023-01-01' = {
+  parent: webAppService
+  name: 'logs'
+  properties: {
+    applicationLogs: {
+      fileSystem: {
+        level: 'Information'
+      }
+    }
+    httpLogs: {
+      fileSystem: {
+        enabled: true
+        retentionInMb: 35
+        retentionInDays: 30
+      }
+    }
+    failedRequestsTracing: {
+      enabled: true
+    }
+    detailedErrorMessages: {
+      enabled: true
+    }
   }
 }
 

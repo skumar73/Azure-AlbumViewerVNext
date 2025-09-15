@@ -38,9 +38,19 @@ jobs:
           cd ${{ env.WEB_PROJECT_PATH }}
           npm run build -- --configuration=production
 
-          # Copy environment generation files to dist folder
-          cp src/generate-env.js dist/
-          cp src/env.js.template dist/
+          # Generate env.js file with API URL
+          API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
+          echo "Generating env.js with API_URL: $API_URL"
+          
+          # Create env.js file directly in dist folder
+          cat > dist/env.js << EOF
+          (function(window) {
+            window.__env = window.__env || {};
+            window.__env.API_URL = '$API_URL';
+          })(this);
+          EOF
+
+          # Copy other required files
           cp src/web.config dist/
 
           echo "Build completed. Contents of dist folder:"
@@ -50,17 +60,6 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Configure App Service environment variables
-        run: |
-          # Set API_URL environment variable on the App Service
-          API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
-          echo "Setting API_URL to: $API_URL"
-          
-          az webapp config appsettings set \
-            --resource-group kiz-albumviewer-rg \
-            --name ${{ env.WEB_APP_NAME }} \
-            --settings API_URL="$API_URL"
 
       - name: Deploy Angular app to Azure App Service
         uses: azure/webapps-deploy@v2
