@@ -14,6 +14,19 @@ param sqlAdminUsername string = 'albumadmin'
 @secure()
 param sqlAdminPassword string
 
+// Azure AD Authentication parameters
+@description('Enable Azure AD authentication for SQL Server')
+param enableAzureADAuth bool = true
+
+@description('Azure AD administrator login name (UPN or group name)')
+param azureADAdminLogin string = ''
+
+@description('Azure AD administrator object ID (user or group)')
+param azureADAdminObjectId string = ''
+
+@description('Azure AD tenant ID')
+param azureADTenantId string = tenant().tenantId
+
 targetScope = 'subscription'
 
 // Create Resource Group
@@ -71,6 +84,10 @@ module sqlServer 'modules/sql-server.bicep' = {
     environment: environment
     sqlAdminUsername: sqlAdminUsername
     sqlAdminPassword: sqlAdminPassword
+    enableAzureADAuth: enableAzureADAuth
+    azureADAdminLogin: azureADAdminLogin
+    azureADAdminObjectId: azureADAdminObjectId
+    azureADTenantId: azureADTenantId
   }
 }
 

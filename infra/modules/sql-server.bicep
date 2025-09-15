@@ -7,6 +7,19 @@ param sqlAdminUsername string
 @secure()
 param sqlAdminPassword string
 
+// Azure AD Authentication parameters
+@description('Enable Azure AD authentication for SQL Server')
+param enableAzureADAuth bool = true
+
+@description('Azure AD administrator login name (UPN or group name)')
+param azureADAdminLogin string = ''
+
+@description('Azure AD administrator object ID (user or group)')
+param azureADAdminObjectId string = ''
+
+@description('Azure AD tenant ID')
+param azureADTenantId string = ''
+
 var tags = {
   Environment: environment
   Project: 'AlbumViewer'
@@ -23,6 +36,18 @@ resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
     version: '12.0'
     minimalTlsVersion: '1.2'
     publicNetworkAccess: 'Enabled'
+  }
+}
+
+// Azure AD Administrator configuration (conditional deployment)
+resource sqlServerAADAdmin 'Microsoft.Sql/servers/administrators@2023-05-01-preview' = if (enableAzureADAuth && !empty(azureADAdminObjectId)) {
+  parent: sqlServer
+  name: 'ActiveDirectory'
+  properties: {
+    administratorType: 'ActiveDirectory'
+    login: azureADAdminLogin
+    sid: azureADAdminObjectId
+    tenantId: azureADTenantId
   }
 }
 
@@ -46,7 +71,7 @@ resource sqlFirewallRuleAllowAll 'Microsoft.Sql/servers/firewallRules@2023-05-01
   }
 }
 
-resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-05-01-preview' = {
+resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01' = {
   parent: sqlServer
   name: sqlDatabaseName
   location: location

@@ -37,6 +37,15 @@
     },
     "sqlAdminPassword": {
       "value": "AlbumDemo123!"
+    },
+    "enableAzureADAuth": {
+      "value": true
+    },
+    "azureADAdminLogin": {
+      "value": ""
+    },
+    "azureADAdminObjectId": {
+      "value": ""
     }
   }
 }
