@@ -2,14 +2,10 @@ name: Deploy API to Azure
 
 on:
   push:
-    # Only run the API deployment for pushes to the master branch
-    branches: ["master"]
-    # Watch API source files but ignore built/static files under wwwroot
+    branches: ["*"]
     paths:
       - "src/AlbumViewerNetCore/**"
-    # Ignore changes in the built wwwroot folder so static file commits don't trigger the API deploy
-    paths-ignore:
-      - "src/AlbumViewerNetCore/wwwroot/**"
+      - ".github/workflows/deploy-api.yml"
   workflow_dispatch:
 
 env:
