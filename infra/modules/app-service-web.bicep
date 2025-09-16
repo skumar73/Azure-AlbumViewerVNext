@@ -50,7 +50,11 @@ resource webAppService 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '0'
+          value: '1'
+        }
+        {
+          name: 'ASPNETCORE_ENVIRONMENT'
+          value: environment
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
