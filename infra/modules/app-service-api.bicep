@@ -7,6 +7,10 @@ param applicationInsightsConnectionString string
 param sqlConnectionString string
 param webAppUrl string
 param logAnalyticsWorkspaceId string
+@description('Resource ID of the user-assigned managed identity for the API app')
+param managedIdentityResourceId string
+@description('Principal ID of the user-assigned managed identity for the API app')
+param managedIdentityPrincipalId string
 
 var tags = {
   Environment: environment
@@ -18,6 +22,12 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
   name: apiAppName
   location: location
   tags: tags
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityResourceId}': {}
+    }
+  }
   properties: {
     serverFarmId: appServicePlanId
     httpsOnly: true

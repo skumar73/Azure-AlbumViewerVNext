@@ -32,13 +32,25 @@ var webHost = builder.WebHost;
 var environment = builder.Environment;
 
 
-services.AddDbContext<AlbumViewerContext>(builder =>
+services.AddDbContext<AlbumViewerContext>(dbCtxOptions =>
 {
     string useSqLite = configuration["Data:useSqLite"];
     if (useSqLite != "true")
     {
-        var connStr = configuration["Data:SqlServerConnectionString"];
-        builder.UseSqlServer(connStr, opt => opt.EnableRetryOnFailure());
+        // Prefer environment variable, fallback to config
+        var connStr = configuration["Data__SqlServerConnectionString"]
+            ?? configuration["Data:SqlServerConnectionString"];
+
+        if (!string.IsNullOrEmpty(connStr) && connStr.Contains("Authentication=Active Directory Managed Identity", StringComparison.OrdinalIgnoreCase))
+        {
+            // Use managed identity connection string as is
+            dbCtxOptions.UseSqlServer(connStr, opt => opt.EnableRetryOnFailure());
+        }
+        else
+        {
+            // Fallback to SQL auth or other
+            dbCtxOptions.UseSqlServer(connStr, opt => opt.EnableRetryOnFailure());
+        }
     }
     else
     {
@@ -46,7 +58,7 @@ services.AddDbContext<AlbumViewerContext>(builder =>
         // to create the DB and write to it.
         var connStr = "Data Source=" +
                       Path.Combine(environment.ContentRootPath, "AlbumViewerData.sqlite");
-        builder.UseSqlite(connStr);
+        dbCtxOptions.UseSqlite(connStr);
     }
 });
 

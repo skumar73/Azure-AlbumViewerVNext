@@ -38,6 +38,9 @@
     "sqlAdminPassword": {
       "value": "AlbumDemo123!"
     },
+    "albumManagedIdentity": {
+      "value": "kiz-albumviewer-udmi"
+    },
     "enableAzureADAuth": {
       "value": true
     },

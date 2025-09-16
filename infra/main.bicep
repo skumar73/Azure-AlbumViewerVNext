@@ -13,6 +13,16 @@ param logAnalyticsWorkspaceName string = 'kiz-albumviewer-logs'
 param sqlAdminUsername string = 'albumadmin'
 @secure()
 param sqlAdminPassword string
+param albumManagedIdentity string = 'kiz-albumviewer-udmi'
+// Deploy Managed Identity
+module managedIdentity 'modules/managed-identity.bicep' = {
+  name: 'managedIdentity'
+  scope: rg
+  params: {
+    albumManagedIdentity: albumManagedIdentity
+    location: location
+  }
+}
 
 // Azure AD Authentication parameters
 @description('Enable Azure AD authentication for SQL Server')
@@ -104,6 +114,8 @@ module apiAppService 'modules/app-service-api.bicep' = {
     sqlConnectionString: 'Server=tcp:${sqlServer.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlDatabaseName};Persist Security Info=False;User ID=${sqlAdminUsername};Password=${sqlAdminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
     webAppUrl: 'https://${webAppName}.azurewebsites.net' // Forward reference is OK here
     logAnalyticsWorkspaceId: logAnalytics.outputs.logAnalyticsWorkspaceId
+    managedIdentityResourceId: managedIdentity.outputs.managedIdentityResourceId
+    managedIdentityPrincipalId: managedIdentity.outputs.managedIdentityPrincipalId
   }
 }
 

@@ -1,3 +1,35 @@
+// Create contained database user for managed identity and grant db_owner
+resource createDbUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'create-db-user-for-mi'
+  location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityResourceId}': {}
+    }
+  }
+  kind: 'AzurePowerShell'
+  properties: {
+    azPowerShellVersion: '11.0'
+    forceUpdateTag: uniqueString(sqlDatabaseName, managedIdentityPrincipalId)
+    arguments: '-serverName "${sqlServerName}" -databaseName "${sqlDatabaseName}" -userObjectId "${managedIdentityPrincipalId}" -userName "${albumManagedIdentity}"'
+    scriptContent: '''
+      $ErrorActionPreference = "Stop"
+      $connString = "Server=tcp:$serverName,1433;Initial Catalog=$databaseName;Authentication=Active Directory MSI;"
+      $query = @"
+      IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'$userName')
+      BEGIN
+        CREATE USER [$userName] FROM EXTERNAL PROVIDER;
+      END
+      ALTER ROLE db_owner ADD MEMBER [$userName];
+      "@
+      Invoke-AzSqlDatabaseQuery -ConnectionString $connString -Query $query
+    '''
+    cleanupPreference: 'OnSuccess'
+    retentionInterval: 'P1D'
+  }
+  dependsOn: [sqlDatabase]
+}
 @description('Azure SQL Server and Database')
 param sqlServerName string
 param sqlDatabaseName string
@@ -17,6 +49,12 @@ param azureADAdminLogin string = ''
 @description('Azure AD administrator object ID (user or group)')
 param azureADAdminObjectId string = ''
 
+@description('Resource ID of the user-assigned managed identity for the API app')
+param managedIdentityResourceId string
+@description('Principal ID of the user-assigned managed identity for the API app')
+param managedIdentityPrincipalId string
+@description('Name of the managed identity (for DB user)')
+param albumManagedIdentity string
 @description('Azure AD tenant ID')
 param azureADTenantId string = ''
 
@@ -59,7 +97,6 @@ resource sqlFirewallRule 'Microsoft.Sql/servers/firewallRules@2023-05-01-preview
     endIpAddress: '0.0.0.0'
   }
 }
-
 
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01' = {
   parent: sqlServer
