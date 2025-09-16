@@ -42,6 +42,24 @@ jobs:
             cp src/web.config dist/
           fi
 
+      - name: Debug show Node/npm and dist contents
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}
+          echo Node: $(node --version)
+          echo Npm: $(npm --version)
+          echo Working dir: $(pwd)
+          ls -la
+          echo dist contents:
+          ls -la dist || echo dist not present
+
+      - name: Ensure zip is installed (runner)
+        run: |
+          if ! command -v zip >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y zip
+          else
+            echo "zip already installed"
+          fi
+
       - name: Zip build output
         run: |
           cd ${{ env.WEB_PROJECT_PATH }}
