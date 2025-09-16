@@ -67,12 +67,12 @@ services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
         builder => builder
-            // Allow the front-end origin (SetIsOriginAllowed used to allow dynamic origins)
+            // required if AllowCredentials is set also
             .SetIsOriginAllowed(s => true)
-            // Allow common HTTP methods used by the SPA
-            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
+            //.AllowAnyOrigin()
+            .AllowAnyMethod()  // doesn't work for DELETE!
+            .WithMethods("DELETE")
             .AllowAnyHeader()
-            // AllowCredentials should be used only if you actually send credentials from the browser
             .AllowCredentials()
     );
 });

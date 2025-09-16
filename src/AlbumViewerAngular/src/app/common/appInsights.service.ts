@@ -15,8 +15,6 @@ export class AppInsightsService {
                 config: {
                     connectionString: connectionString,
                     enableAutoRouteTracking: true, // Automatically track route changes
-                    // Allow Cross Origin
-                    enableCorsCorrelation: true,
                 },
             });
             this.appInsights.loadAppInsights();
