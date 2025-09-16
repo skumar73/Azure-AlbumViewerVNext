@@ -26,6 +26,7 @@ namespace AlbumViewerAspNetCore
     /// or manual token validation by the APIs in this class.
     /// </summary>
     [ServiceFilter(typeof(ApiExceptionFilter))]
+    [EnableCors("CorsPolicy")]
     public class AccountController : Controller
     {
         public ApplicationConfiguration Configuration { get; }

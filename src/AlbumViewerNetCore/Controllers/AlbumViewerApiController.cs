@@ -1,6 +1,7 @@
 using AlbumViewerBusiness;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,8 @@ using System.Threading.Tasks;
 
 namespace AlbumViewerAspNetCore
 {
-    [ServiceFilter(typeof(ApiExceptionFilter))]    
+    [ServiceFilter(typeof(ApiExceptionFilter))]
+    [EnableCors("CorsPolicy")]
     public class AlbumViewerApiController : Controller
     {
         AlbumViewerContext context;

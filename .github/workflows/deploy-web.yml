@@ -1,4 +1,4 @@
-name: Deploy Web App (KISS)
+name: Deploy Web App
 
 on:
   push:
