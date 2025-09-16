@@ -10,7 +10,7 @@ on:
 
 env:
   WEB_APP_NAME: kiz-albumviewer-web
-  API_APP_NAME: kiz-albumviewer-api
+  AZURE_RESOURCE_GROUP: kiz-albumviewer-rg
   WEB_PROJECT_PATH: src/AlbumViewerAngular
 
 jobs:
@@ -33,59 +33,40 @@ jobs:
           cd ${{ env.WEB_PROJECT_PATH }}
           npm ci
 
-      - name: Build Angular app
+      - name: Build Angular app (production)
         run: |
           cd ${{ env.WEB_PROJECT_PATH }}
           npm run build -- --configuration=production
 
-          # Generate env.js file with API URL
-          API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
-          echo "Generating env.js with API_URL: $API_URL"
+          # Copy web.config for App Service (IIS) compatibility if present
+          if [ -f src/web.config ]; then
+            cp src/web.config dist/
+          fi
 
-          # Create env.js file directly in dist folder
-          cat > dist/env.js << EOF
-          (function(window) {
-            window.__env = window.__env || {};
-            window.__env.API_URL = '$API_URL';
-          })(this);
-          EOF
-
-          # Copy other required files
-          cp src/web.config dist/
-
-          echo "Build completed. Contents of dist folder:"
-          ls -la dist/
-
-      - name: Create deployment package
+      - name: Zip build output
         run: |
           cd ${{ env.WEB_PROJECT_PATH }}
-          # Create a deployment folder with the contents that should go to wwwroot
-          mkdir -p deployment
-          cp -r dist/* deployment/
-          
-          echo "Deployment package contents:"
-          ls -la deployment/
+          cd dist
+          zip -r ../deployment.zip .
 
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Angular app to Azure App Service
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.WEB_APP_NAME }}
-          package: ${{ env.WEB_PROJECT_PATH }}/deployment
+      - name: Deploy ZIP package to App Service (ZIP Deploy)
+        run: |
+          az webapp deployment source config-zip \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.WEB_APP_NAME }} \
+            --src ${{ env.WEB_PROJECT_PATH }}/deployment.zip
 
       - name: Verify Web deployment
         run: |
           echo "🎉 Web app deployment completed!"
-          echo "📍 Web app deployed to: https://${{ env.WEB_APP_NAME }}.azurewebsites.net"
-
-          # Wait a moment for deployment to complete
-          sleep 30
-
-          # Test the web app endpoint
           WEB_URL="https://${{ env.WEB_APP_NAME }}.azurewebsites.net"
           echo "Testing Web app at: $WEB_URL"
-          curl -f "$WEB_URL" || echo "Web app verification failed, but deployment completed"
+          # Try fetching env.js first to ensure the runtime file exists
+          curl -f "$WEB_URL/env.js" || (echo "env.js not found" && exit 1)
+          # Then fetch root
+          curl -f "$WEB_URL" || (echo "Root page check failed" && exit 1)
