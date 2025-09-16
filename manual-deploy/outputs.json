@@ -1,0 +1,38 @@
+{
+  "apiAppName": {
+    "type": "String",
+    "value": "kiz-albumviewer-api"
+  },
+  "apiAppUrl": {
+    "type": "String",
+    "value": "https://kiz-albumviewer-api.azurewebsites.net"
+  },
+  "applicationInsightsConnectionString": {
+    "type": "String",
+    "value": "InstrumentationKey=9d7d0f3c-bc0b-4be1-8b83-8264e4336b21;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus2.livediagnostics.monitor.azure.com/;ApplicationId=dc850936-4963-44be-8ef7-8937fca75bbe"
+  },
+  "applicationInsightsInstrumentationKey": {
+    "type": "String",
+    "value": "9d7d0f3c-bc0b-4be1-8b83-8264e4336b21"
+  },
+  "logAnalyticsWorkspaceId": {
+    "type": "String",
+    "value": "/subscriptions/f78f59ad-cf27-4eff-8f5e-6f97b34798aa/resourceGroups/kiz-albumviewer-rg/providers/Microsoft.OperationalInsights/workspaces/kiz-albumviewer-logs"
+  },
+  "resourceGroupName": {
+    "type": "String",
+    "value": "kiz-albumviewer-rg"
+  },
+  "sqlDatabaseName": {
+    "type": "String",
+    "value": "kiz-albumviewer-db"
+  },
+  "sqlServerFqdn": {
+    "type": "String",
+    "value": "kiz-albumviewer-sql.database.windows.net"
+  },
+  "webAppUrl": {
+    "type": "String",
+    "value": "https://kiz-albumviewer-web.azurewebsites.net"
+  }
+}

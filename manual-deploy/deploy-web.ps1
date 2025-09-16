@@ -8,8 +8,8 @@ param(
 )
 
 # Login to Azure (interactive or with service principal)
-Write-Host "Logging in to Azure..."
-az login
+# Write-Host "Logging in to Azure..."
+# az login
 
 # Build Angular app
 Write-Host "Building Angular app..."

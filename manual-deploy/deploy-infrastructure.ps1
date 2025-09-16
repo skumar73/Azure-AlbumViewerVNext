@@ -7,8 +7,8 @@ param(
 )
 
 # Login to Azure (interactive or with service principal)
-Write-Host "Logging in to Azure..."
-az login
+# Write-Host "Logging in to Azure..."
+# az login
 
 # Deploy Bicep infrastructure
 Write-Host "Deploying Bicep infrastructure..."
@@ -38,4 +38,28 @@ Write-Host "Setting Data__SqlServerConnectionString to: $miConnString"
 az webapp config appsettings set `
     --name $apiAppName `
     --resource-group $ResourceGroup `
-    --settings Data__SqlServerConnectionString="$miConnString"
+    --settings "Data__SqlServerConnectionString=$miConnString"
+
+# Create database user for managed identity
+Write-Host "Creating database user for managed identity..."
+$managedIdentityName = "kiz-albumviewer-udmi"
+$sqlQuery = @"
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'$managedIdentityName')
+BEGIN
+    CREATE USER [$managedIdentityName] FROM EXTERNAL PROVIDER;
+END
+ALTER ROLE db_owner ADD MEMBER [$managedIdentityName];
+"@
+
+# Connect to SQL using your Azure AD credentials and execute the query
+Write-Host "Executing SQL command to grant database access to managed identity..."
+try {
+    az sql query --server $sqlServer --database $sqlDb --auth-type ActiveDirectoryIntegrated --execute-command $sqlQuery
+    Write-Host "✅ Database user created and permissions granted successfully!"
+}
+catch {
+    Write-Host "⚠️ Failed to create database user. You may need to run this manually:"
+    Write-Host "SQL Query: $sqlQuery"
+    Write-Host "Server: $sqlServer"
+    Write-Host "Database: $sqlDb"
+}
