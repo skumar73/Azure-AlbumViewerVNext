@@ -25,8 +25,7 @@ namespace AlbumViewerAspNetCore
     /// is updated as appropriate and can be used in [Authorize] access control
     /// or manual token validation by the APIs in this class.
     /// </summary>
-    [ServiceFilter(typeof(ApiExceptionFilter))]
-    [EnableCors("CorsPolicy")]
+    [ServiceFilter(typeof(ApiExceptionFilter))]   
     public class AccountController : Controller
     {
         public ApplicationConfiguration Configuration { get; }

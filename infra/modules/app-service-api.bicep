@@ -38,10 +38,8 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
         }
       ]
       cors: {
-        allowedOrigins: [
-          webAppUrl
-        ]
-        supportCredentials: false
+        allowedOrigins: [webAppUrl]
+        supportCredentials: true
       }
       appSettings: [
         {
