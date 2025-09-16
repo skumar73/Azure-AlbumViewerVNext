@@ -176,9 +176,6 @@ builder.Services.AddSwaggerGen(options =>
 //
 var app = builder.Build();
 
-// CORS must be early in the pipeline, before exception handlers
-app.UseCors("CorsPolicy");
-
 // Get any injected items
 var albumContext = app.Services.CreateScope().ServiceProvider.GetService<AlbumViewerContext>();
 
@@ -236,6 +233,8 @@ app.UseStatusCodePages();
 //app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
