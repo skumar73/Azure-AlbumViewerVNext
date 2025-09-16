@@ -63,4 +63,4 @@ jobs:
           # Test the API endpoint
           API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net"
           echo "Testing API at: $API_URL"
-            curl -f "$API_URL" || echo "API verification failed, but deployment completed"
+          curl -f "$API_URL" || echo "API verification failed, but deployment completed"
