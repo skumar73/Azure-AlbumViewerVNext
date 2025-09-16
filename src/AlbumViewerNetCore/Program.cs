@@ -244,7 +244,10 @@ app.UseAuthorization();
 // Removed authentication check for Swagger
 
 // Map API controllers (modern syntax)
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    _ = endpoints.MapControllers();
+});
 
 // Add root endpoint to show this is an API-only service
 app.MapGet("/", () => new
