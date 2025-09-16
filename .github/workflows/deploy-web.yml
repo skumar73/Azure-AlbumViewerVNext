@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd ${{ env.WEB_PROJECT_PATH }}
-          npm ci
+          npm install --no-audit --no-fund
 
       - name: Build Angular app (production)
         run: |
