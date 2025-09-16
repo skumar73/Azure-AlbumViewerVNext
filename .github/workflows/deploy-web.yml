@@ -25,7 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "16"
-          # cache disabled to avoid failing when package-lock.json is not present on workflow runner
+          cache: "npm"
+          cache-dependency-path: "src/AlbumViewerAngular/package-lock.json"
 
       - name: Install dependencies
         run: |
