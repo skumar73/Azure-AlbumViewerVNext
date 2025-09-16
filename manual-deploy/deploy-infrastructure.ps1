@@ -30,36 +30,15 @@ Write-Host "API URL: $apiUrl"
 Write-Host "Web URL: $webUrl"
 Write-Host "SQL Server: $sqlServer"
 
-# Set API App Connection String for Managed Identity
+# Set API App Connection String for SQL Server Authentication
 $apiAppName = $outputs.apiAppName.value
 $sqlDb = $outputs.sqlDatabaseName.value
-$miConnString = "Server=tcp:$sqlServer,1433;Database=$sqlDb;Authentication=Active Directory Managed Identity;"
-Write-Host "Setting Data__SqlServerConnectionString to: $miConnString"
+$sqlConnString = "Server=tcp:$sqlServer,1433;Database=$sqlDb;User ID=albumadmin;Password=YourSecurePassword123!;Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;"
+Write-Host "Setting Data__SqlServerConnectionString to: $sqlConnString"
 az webapp config appsettings set `
     --name $apiAppName `
     --resource-group $ResourceGroup `
-    --settings "Data__SqlServerConnectionString=$miConnString"
+    --settings "Data__SqlServerConnectionString=$sqlConnString"
 
-# Create database user for managed identity
-Write-Host "Creating database user for managed identity..."
-$managedIdentityName = "kiz-albumviewer-udmi"
-$sqlQuery = @"
-IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'$managedIdentityName')
-BEGIN
-    CREATE USER [$managedIdentityName] FROM EXTERNAL PROVIDER;
-END
-ALTER ROLE db_owner ADD MEMBER [$managedIdentityName];
-"@
-
-# Connect to SQL using your Azure AD credentials and execute the query
-Write-Host "Executing SQL command to grant database access to managed identity..."
-try {
-    az sql query --server $sqlServer --database $sqlDb --auth-type ActiveDirectoryIntegrated --execute-command $sqlQuery
-    Write-Host "✅ Database user created and permissions granted successfully!"
-}
-catch {
-    Write-Host "⚠️ Failed to create database user. You may need to run this manually:"
-    Write-Host "SQL Query: $sqlQuery"
-    Write-Host "Server: $sqlServer"
-    Write-Host "Database: $sqlDb"
-}
+# No need to create managed identity database user for SQL Server authentication
+Write-Host "✅ Using SQL Server authentication - no additional database user creation needed!"

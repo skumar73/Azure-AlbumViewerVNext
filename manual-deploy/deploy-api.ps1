@@ -29,7 +29,7 @@ dotnet publish $ApiProjectPath --configuration Release --output $publishDir --no
 
 # Deploy to Azure App Service
 Write-Host "Deploying API to Azure App Service..."
-az webapp deploy --name $ApiAppName --src-path $publishDir --type zip
+az webapp deploy --name $ApiAppName --resource-group "kiz-albumviewer-rg" --src-path $publishDir --type zip
 
 # Verify API deployment
 $apiUrl = "https://$ApiAppName.azurewebsites.net"

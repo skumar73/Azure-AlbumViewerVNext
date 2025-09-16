@@ -15,9 +15,9 @@ param sqlAdminUsername string = 'albumadmin'
 param sqlAdminPassword string
 param albumManagedIdentity string = 'kiz-albumviewer-udmi'
 
-// Azure AD Authentication parameters
-@description('Enable Azure AD authentication for SQL Server')
-param enableAzureADAuth bool = true
+// Azure AD Authentication parameters for dual auth
+@description('Enable Azure AD-only authentication for SQL Server (false = dual auth, true = AAD-only)')
+param enableAzureADAuth bool = false
 
 @description('Azure AD administrator login name (UPN or group name)')
 param azureADAdminLogin string = ''
@@ -99,9 +99,6 @@ module sqlServer 'modules/sql-server.bicep' = {
     azureADAdminLogin: azureADAdminLogin
     azureADAdminObjectId: azureADAdminObjectId
     azureADTenantId: azureADTenantId
-    albumManagedIdentity: albumManagedIdentity
-    managedIdentityPrincipalId: managedIdentity.outputs.managedIdentityPrincipalId
-    managedIdentityResourceId: managedIdentity.outputs.managedIdentityResourceId
   }
 }
 
@@ -119,7 +116,6 @@ module apiAppService 'modules/app-service-api.bicep' = {
     webAppUrl: 'https://${webAppName}.azurewebsites.net' // Forward reference is OK here
     logAnalyticsWorkspaceId: logAnalytics.outputs.logAnalyticsWorkspaceId
     managedIdentityResourceId: managedIdentity.outputs.managedIdentityResourceId
-    managedIdentityPrincipalId: managedIdentity.outputs.managedIdentityPrincipalId
   }
 }
 
@@ -145,11 +141,17 @@ output resourceGroupName string = rg.name
 @description('API App Service URL')
 output apiAppUrl string = apiAppService.outputs.apiAppUrl
 
+@description('API App Name')
+output apiAppName string = apiAppName
+
 @description('Web App Service URL')
 output webAppUrl string = webAppService.outputs.webAppUrl
 
 @description('SQL Server FQDN')
 output sqlServerFqdn string = sqlServer.outputs.sqlServerFqdn
+
+@description('SQL Database Name')
+output sqlDatabaseName string = sqlDatabaseName
 
 @description('Application Insights Instrumentation Key')
 output applicationInsightsInstrumentationKey string = appInsights.outputs.applicationInsightsInstrumentationKey

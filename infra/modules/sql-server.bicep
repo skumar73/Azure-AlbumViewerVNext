@@ -1,35 +1,6 @@
-// Create contained database user for managed identity and grant db_owner
-resource createDbUserScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'create-db-user-for-mi'
-  location: location
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${managedIdentityResourceId}': {}
-    }
-  }
-  kind: 'AzurePowerShell'
-  properties: {
-    azPowerShellVersion: '11.0'
-    forceUpdateTag: uniqueString(sqlDatabaseName, managedIdentityPrincipalId)
-    arguments: '-serverName "${sqlServerName}" -databaseName "${sqlDatabaseName}" -userObjectId "${managedIdentityPrincipalId}" -userName "${albumManagedIdentity}"'
-    scriptContent: '''
-      $ErrorActionPreference = "Stop"
-      $connString = "Server=tcp:$serverName,1433;Initial Catalog=$databaseName;Authentication=Active Directory MSI;"
-      $query = @"
-      IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'$userName')
-      BEGIN
-        CREATE USER [$userName] FROM EXTERNAL PROVIDER;
-      END
-      ALTER ROLE db_owner ADD MEMBER [$userName];
-      "@
-      Invoke-AzSqlDatabaseQuery -ConnectionString $connString -Query $query
-    '''
-    cleanupPreference: 'OnSuccess'
-    retentionInterval: 'P1D'
-  }
-  dependsOn: [sqlDatabase]
-}
+// NOTE: Database user creation for managed identity will be handled post-deployment
+// This avoids storage account authentication issues with deployment scripts
+
 @description('Azure SQL Server and Database')
 param sqlServerName string
 param sqlDatabaseName string
@@ -39,9 +10,9 @@ param sqlAdminUsername string
 @secure()
 param sqlAdminPassword string
 
-// Azure AD Authentication parameters
-@description('Enable Azure AD authentication for SQL Server')
-param enableAzureADAuth bool = true
+// Azure AD Authentication parameters for dual auth
+@description('Enable Azure AD-only authentication for SQL Server (false = dual auth, true = AAD-only)')
+param enableAzureADAuth bool = false
 
 @description('Azure AD administrator login name (UPN or group name)')
 param azureADAdminLogin string = ''
@@ -49,12 +20,6 @@ param azureADAdminLogin string = ''
 @description('Azure AD administrator object ID (user or group)')
 param azureADAdminObjectId string = ''
 
-@description('Resource ID of the user-assigned managed identity for the API app')
-param managedIdentityResourceId string
-@description('Principal ID of the user-assigned managed identity for the API app')
-param managedIdentityPrincipalId string
-@description('Name of the managed identity (for DB user)')
-param albumManagedIdentity string
 @description('Azure AD tenant ID')
 param azureADTenantId string = ''
 
@@ -77,8 +42,8 @@ resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
   }
 }
 
-// Azure AD Administrator configuration (conditional deployment)
-resource sqlServerAADAdmin 'Microsoft.Sql/servers/administrators@2023-05-01-preview' = if (enableAzureADAuth && !empty(azureADAdminObjectId)) {
+// Azure AD Administrator configuration for dual authentication (when enableAzureADAuth = false)
+resource sqlServerAADAdmin 'Microsoft.Sql/servers/administrators@2023-05-01-preview' = if (!enableAzureADAuth && !empty(azureADAdminObjectId)) {
   parent: sqlServer
   name: 'ActiveDirectory'
   properties: {
@@ -88,6 +53,8 @@ resource sqlServerAADAdmin 'Microsoft.Sql/servers/administrators@2023-05-01-prev
     tenantId: azureADTenantId
   }
 }
+
+// Firewall rule to allow Azure services
 
 resource sqlFirewallRule 'Microsoft.Sql/servers/firewallRules@2023-05-01-preview' = {
   parent: sqlServer

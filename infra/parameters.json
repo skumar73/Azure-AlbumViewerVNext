@@ -42,13 +42,13 @@
       "value": "kiz-albumviewer-udmi"
     },
     "enableAzureADAuth": {
-      "value": true
+      "value": false
     },
     "azureADAdminLogin": {
-      "value": ""
+      "value": "makizhne_microsoft.com#EXT#@fdpo.onmicrosoft.com"
     },
     "azureADAdminObjectId": {
-      "value": ""
+      "value": "b9ce58c2-3ee3-46aa-923e-2c3ddf78bcfa"
     }
   }
 }

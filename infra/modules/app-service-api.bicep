@@ -9,8 +9,6 @@ param webAppUrl string
 param logAnalyticsWorkspaceId string
 @description('Resource ID of the user-assigned managed identity for the API app')
 param managedIdentityResourceId string
-@description('Principal ID of the user-assigned managed identity for the API app')
-param managedIdentityPrincipalId string
 
 var tags = {
   Environment: environment
