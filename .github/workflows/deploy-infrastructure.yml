@@ -45,14 +45,14 @@ jobs:
           echo "📍 Web URL: $WEB_URL"
           echo "📍 SQL Server: $SQL_SERVER"
 
-      - name: Set API App Connection String for Managed Identity
+      - name: Set API App Connection String for SQL Authentication
         run: |
           API_APP_NAME=$(cat outputs.json | jq -r '.apiAppName.value')
           SQL_SERVER=$(cat outputs.json | jq -r '.sqlServerFqdn.value')
           SQL_DB=$(jq -r '.sqlDatabaseName.value' outputs.json)
-          MI_CONN_STRING="Server=tcp:$SQL_SERVER,1433;Database=$SQL_DB;Authentication=Active Directory Managed Identity;"
-          echo "Setting Data__SqlServerConnectionString to: $MI_CONN_STRING"
+          SQL_CONN_STRING="Server=tcp:$SQL_SERVER,1433;Database=$SQL_DB;User ID=albumadmin;Password=AlbumDemo123!;Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;"
+          echo "Setting Data__SqlServerConnectionString to: $SQL_CONN_STRING"
           az webapp config appsettings set \
             --name "$API_APP_NAME" \
             --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
-            --settings Data__SqlServerConnectionString="$MI_CONN_STRING"
+            --settings Data__SqlServerConnectionString="$SQL_CONN_STRING"
