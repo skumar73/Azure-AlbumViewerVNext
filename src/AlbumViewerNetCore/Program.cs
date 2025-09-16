@@ -71,7 +71,7 @@ services.AddCors(options =>
             .SetIsOriginAllowed(s => true)
             //.AllowAnyOrigin()
             .AllowAnyMethod()  // doesn't work for DELETE!
-            .WithMethods("DELETE")
+           // .WithMethods("DELETE")
             .AllowAnyHeader()
             .AllowCredentials()
     );
