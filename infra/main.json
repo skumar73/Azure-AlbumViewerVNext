@@ -18,46 +18,86 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "eastus2"
+      "defaultValue": "eastus2",
+      "metadata": {
+        "description": "Location for all resources"
+      }
     },
     "environment": {
       "type": "string",
-      "defaultValue": "prod"
+      "defaultValue": "prod",
+      "metadata": {
+        "description": "Environment tag applied to all resources"
+      }
     },
     "appServicePlanName": {
       "type": "string",
-      "defaultValue": "kiz-albumviewer-plan"
+      "defaultValue": "kiz-albumviewer-plan",
+      "metadata": {
+        "description": "App Service Plan for hosting both API and Web applications"
+      }
     },
     "apiAppName": {
       "type": "string",
-      "defaultValue": "kiz-albumviewer-api"
+      "defaultValue": "kiz-albumviewer-api",
+      "metadata": {
+        "description": "App Service for the .NET 8 Web API backend"
+      }
     },
     "webAppName": {
       "type": "string",
-      "defaultValue": "kiz-albumviewer-web"
+      "defaultValue": "kiz-albumviewer-web",
+      "metadata": {
+        "description": "App Service for the Angular frontend"
+      }
     },
     "sqlServerName": {
       "type": "string",
-      "defaultValue": "kiz-albumviewer-sql"
+      "defaultValue": "kiz-albumviewer-sql",
+      "metadata": {
+        "description": "Azure SQL Server name"
+      }
     },
     "sqlDatabaseName": {
       "type": "string",
-      "defaultValue": "kiz-albumviewer-db"
+      "defaultValue": "kiz-albumviewer-db",
+      "metadata": {
+        "description": "Azure SQL Database name"
+      }
     },
     "applicationInsightsName": {
       "type": "string",
-      "defaultValue": "kiz-albumviewer-insights"
+      "defaultValue": "kiz-albumviewer-insights",
+      "metadata": {
+        "description": "Application Insights for monitoring both API and Web applications"
+      }
     },
     "logAnalyticsWorkspaceName": {
       "type": "string",
-      "defaultValue": "kiz-albumviewer-logs"
+      "defaultValue": "kiz-albumviewer-logs",
+      "metadata": {
+        "description": "Log Analytics Workspace for Application Insights"
+      }
     },
     "sqlAdminUsername": {
       "type": "string",
-      "defaultValue": "albumadmin"
+      "defaultValue": "albumadmin",
+      "metadata": {
+        "description": "Username for the SQL admin user"
+      }
     },
     "sqlAdminPassword": {
-      "type": "securestring"
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the SQL admin user"
+      }
+    },
+    "albumManagedIdentity" :{
+      "type": "string",
+      "defaultValue": "kiz-albumviewer-udmi",
+      "metadata": {
+        "description": "User-assigned managed identity name for the API app"
+      }
     }
   },
   "resources": [

@@ -28,7 +28,7 @@ namespace AlbumViewerAspNetCore
     {
         AlbumViewerContext context;
         IServiceProvider serviceProvider;
-        
+
         ArtistRepository ArtistRepo;
         AlbumRepository AlbumRepo;
         IConfiguration Configuration;
@@ -39,10 +39,10 @@ namespace AlbumViewerAspNetCore
         private readonly TelemetryClient _telemetryClient;
 
         public AlbumViewerApiController(
-            AlbumViewerContext ctx, 
+            AlbumViewerContext ctx,
             IServiceProvider svcProvider,
-            ArtistRepository artistRepo, 
-            AlbumRepository albumRepo, 
+            ArtistRepository artistRepo,
+            AlbumRepository albumRepo,
             IConfiguration config,
             ILogger<AlbumViewerApiController> logger,
             IWebHostEnvironment env,
@@ -290,7 +290,7 @@ namespace AlbumViewerAspNetCore
         [Route("api/throw")]
         public object Throw()
         {
-            throw new InvalidOperationException("This is an unhandled exception");            
+            throw new InvalidOperationException("This is an unhandled exception");
         }
 
         #region admin
@@ -301,34 +301,19 @@ namespace AlbumViewerAspNetCore
             if (!HttpContext.User.Identity.IsAuthenticated)
                 throw new ApiException("You have to be logged in to modify data", 401);
 
-            string isSqLite = Configuration["data:useSqLite"];
+            // Get the DbContext and HostingEnv from DI
+            var context = HttpContext.RequestServices.GetService(typeof(AlbumViewerContext)) as AlbumViewerContext;
+            var env = HttpContext.RequestServices.GetService(typeof(IWebHostEnvironment)) as IWebHostEnvironment;
+
             try
             {
-                if (isSqLite != "true")
-                {
-                    // ExecuteSqlRaw // in EF 3.0
-                    context.Database.ExecuteSqlRaw(@"
+                // ExecuteSqlRaw // in EF 3.0
+                context.Database.ExecuteSqlRaw(@"
 drop table Tracks; 
 drop table Albums;
 drop table Artists;
 drop table Users;
 ");
-                }
-                else
-                {
-                    // this is not reliable for multiple connections
-                    context.Database.CloseConnection();
-
-                    try
-                    {
-                        System.IO.File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "AlbumViewerData.sqlite"));
-                    }
-                    catch
-                    {
-                        throw new ApiException("Can't reset data. Existing database is in use.");
-                    }
-                }
-
             }
             catch (ApiException)
             {
@@ -336,14 +321,12 @@ drop table Users;
             }
             catch { }
 
-
             AlbumViewerDataImporter.EnsureAlbumData(context,
-                Path.Combine(HostingEnv.ContentRootPath, 
-                "albums.js"));
+                Path.Combine(env.ContentRootPath, "albums.js"));
 
             return true;
         }
-  
+
 
         #endregion
     }

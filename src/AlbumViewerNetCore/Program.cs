@@ -34,32 +34,11 @@ var environment = builder.Environment;
 
 services.AddDbContext<AlbumViewerContext>(dbCtxOptions =>
 {
-    string useSqLite = configuration["Data:useSqLite"];
-    if (useSqLite != "true")
-    {
-        // Prefer environment variable, fallback to config
-        var connStr = configuration["Data__SqlServerConnectionString"]
-            ?? configuration["Data:SqlServerConnectionString"];
+    // Prefer environment variable, fallback to config
+    var connStr = configuration["Data__SqlServerConnectionString"]
+        ?? configuration["Data:SqlServerConnectionString"];
 
-        if (!string.IsNullOrEmpty(connStr) && connStr.Contains("Authentication=Active Directory Managed Identity", StringComparison.OrdinalIgnoreCase))
-        {
-            // Use managed identity connection string as is
-            dbCtxOptions.UseSqlServer(connStr, opt => opt.EnableRetryOnFailure());
-        }
-        else
-        {
-            // Fallback to SQL auth or other
-            dbCtxOptions.UseSqlServer(connStr, opt => opt.EnableRetryOnFailure());
-        }
-    }
-    else
-    {
-        // Note this path has to have full  access for the Web user in order
-        // to create the DB and write to it.
-        var connStr = "Data Source=" +
-                      Path.Combine(environment.ContentRootPath, "AlbumViewerData.sqlite");
-        dbCtxOptions.UseSqlite(connStr);
-    }
+    dbCtxOptions.UseSqlServer(connStr, opt => opt.EnableRetryOnFailure());
 });
 
 
@@ -296,8 +275,7 @@ Console.ResetColor();
 Console.WriteLine("\r\nPlatform: " + System.Runtime.InteropServices.RuntimeInformation.OSDescription);
 Console.WriteLine(".NET Version: " + System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);
 Console.WriteLine("Hosting Environment: " + environment.EnvironmentName);
-string useSqLite = configuration["Data:useSqLite"];
-Console.WriteLine(useSqLite == "true" ? "SQLite" : "SQL Server");
+Console.WriteLine("Database: SQL Server");
 
 // Test API deployment workflow
 Console.WriteLine("API ready for deployment to Azure App Service");

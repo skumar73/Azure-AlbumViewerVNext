@@ -14,15 +14,6 @@ param sqlAdminUsername string = 'albumadmin'
 @secure()
 param sqlAdminPassword string
 param albumManagedIdentity string = 'kiz-albumviewer-udmi'
-// Deploy Managed Identity
-module managedIdentity 'modules/managed-identity.bicep' = {
-  name: 'managedIdentity'
-  scope: rg
-  params: {
-    albumManagedIdentity: albumManagedIdentity
-    location: location
-  }
-}
 
 // Azure AD Authentication parameters
 @description('Enable Azure AD authentication for SQL Server')
@@ -46,6 +37,16 @@ resource rg 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   tags: {
     Environment: environment
     Project: 'AlbumViewer'
+  }
+}
+
+// Deploy Managed Identity
+module managedIdentity 'modules/managed-identity.bicep' = {
+  name: 'managedIdentity'
+  scope: rg
+  params: {
+    albumManagedIdentity: albumManagedIdentity
+    location: location
   }
 }
 
@@ -98,6 +99,9 @@ module sqlServer 'modules/sql-server.bicep' = {
     azureADAdminLogin: azureADAdminLogin
     azureADAdminObjectId: azureADAdminObjectId
     azureADTenantId: azureADTenantId
+    albumManagedIdentity: albumManagedIdentity
+    managedIdentityPrincipalId: managedIdentity.outputs.managedIdentityPrincipalId
+    managedIdentityResourceId: managedIdentity.outputs.managedIdentityResourceId
   }
 }
 
