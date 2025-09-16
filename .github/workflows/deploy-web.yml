@@ -1,8 +1,8 @@
-name: Deploy Web App (KISS)
+name: Deploy Web App to Azure
 
 on:
   push:
-    branches: ["master"]
+    branches: ["*"]
     paths:
       - "src/AlbumViewerAngular/**"
       - ".github/workflows/deploy-web.yml"
@@ -14,59 +14,74 @@ env:
   WEB_PROJECT_PATH: src/AlbumViewerAngular
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-web:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "16"
+          # cache disabled to avoid failing when package-lock.json is not present on workflow runner
 
-      - name: Install & Build
+      - name: Install dependencies
         run: |
-          set -e
           cd ${{ env.WEB_PROJECT_PATH }}
-          npm ci --silent || npm install --no-audit --no-fund
-          npm run build -- --configuration=production
-          if [ -f src/web.config ]; then cp src/web.config dist/; fi
+          npm install --no-audit --no-fund
 
-      - name: Azure login
+      - name: Build Angular app (production)
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}
+          npm run build -- --configuration=production
+
+          # Copy web.config for App Service (IIS) compatibility if present
+          if [ -f src/web.config ]; then
+            cp src/web.config dist/
+          fi
+
+      - name: Debug show Node/npm and dist contents
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}
+          echo Node: $(node --version)
+          echo Npm: $(npm --version)
+          echo Working dir: $(pwd)
+          ls -la
+          echo dist contents:
+          ls -la dist || echo dist not present
+
+      - name: Ensure zip is installed (runner)
+        run: |
+          if ! command -v zip >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y zip
+          else
+            echo "zip already installed"
+          fi
+
+      - name: Zip build output
+        run: |
+          cd ${{ env.WEB_PROJECT_PATH }}
+          cd dist
+          zip -r ../deployment.zip .
+
+      - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Generate env.js from App Settings (printf)
+      - name: Deploy ZIP package to App Service (ZIP Deploy)
         run: |
-          set -e
-          SETTINGS=$(az webapp config appsettings list --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" --name "${{ env.WEB_APP_NAME }}" --query "[].{n:name,v:value}" --output tsv || true)
-          API_URL=""
-          APPINSIGHTS=""
-          ENVIRONMENT="production"
-          while IFS=$'\t' read -r name value; do
-            case "$name" in
-              API_URL) API_URL="$value" ;;
-              APPLICATIONINSIGHTS_CONNECTION_STRING) APPINSIGHTS="$value" ;;
-              ASPNETCORE_ENVIRONMENT) ENVIRONMENT="$value" ;;
-            esac
-          done <<< "$SETTINGS"
-          API_URL=${API_URL:-"https://api-placeholder.azurewebsites.net"}
-          mkdir -p ${{ env.WEB_PROJECT_PATH }}/dist
-          printf "(function (window) {\n  window.__env = window.__env || {};\n  window.__env.API_URL = '%s';\n  window.__env.APPLICATIONINSIGHTS_CONNECTION_STRING = '%s';\n  window.__env.ENVIRONMENT = '%s';\n})(this);\n" "$API_URL" "$APPINSIGHTS" "$ENVIRONMENT" > ${{ env.WEB_PROJECT_PATH }}/dist/env.js
-          echo "--- env.js ---"
-          sed -n '1,200p' ${{ env.WEB_PROJECT_PATH }}/dist/env.js || true
+          az webapp deployment source config-zip \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.WEB_APP_NAME }} \
+            --src ${{ env.WEB_PROJECT_PATH }}/deployment.zip
 
-      - name: Zip and deploy
+      - name: Verify Web deployment
         run: |
-          set -e
-          cd ${{ env.WEB_PROJECT_PATH }}/dist
-          zip -r ../deployment.zip .
-          az webapp deployment source config-zip --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" --name "${{ env.WEB_APP_NAME }}" --src ../deployment.zip
-
-      - name: Smoke check
-        run: |
-          set -e
+          echo "🎉 Web app deployment completed!"
           WEB_URL="https://${{ env.WEB_APP_NAME }}.azurewebsites.net"
+          echo "Testing Web app at: $WEB_URL"
+          # Verify root page responds
           curl -f "$WEB_URL" || (echo "Root page check failed" && exit 1)
