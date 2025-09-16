@@ -41,7 +41,7 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
         allowedOrigins: [
           webAppUrl
         ]
-        supportCredentials: false
+        supportCredentials: true
       }
       appSettings: [
         {
@@ -54,7 +54,7 @@ resource apiAppService 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
+          value: '0'
         }
         {
           name: 'Data__SqlServerConnectionString'
