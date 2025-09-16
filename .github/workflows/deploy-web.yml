@@ -66,5 +66,7 @@ jobs:
           echo "🎉 Web app deployment completed!"
           WEB_URL="https://${{ env.WEB_APP_NAME }}.azurewebsites.net"
           echo "Testing Web app at: $WEB_URL"
-          # Verify root page responds
+          # Try fetching env.js first to ensure the runtime file exists
+          curl -f "$WEB_URL/env.js" || (echo "env.js not found" && exit 1)
+          # Then fetch root
           curl -f "$WEB_URL" || (echo "Root page check failed" && exit 1)
