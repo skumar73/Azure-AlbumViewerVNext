@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourceGroupName": {
-      "value": "kiz-albumviewer-rg"
+      "value": "sk-albumviewer-rg"
     },
     "location": {
       "value": "eastus2"
@@ -12,43 +12,43 @@
       "value": "prod"
     },
     "appServicePlanName": {
-      "value": "kiz-albumviewer-plan"
+      "value": "sk-albumviewer-plan"
     },
     "apiAppName": {
-      "value": "kiz-albumviewer-api"
+      "value": "sk-albumviewer-api"
     },
     "webAppName": {
-      "value": "kiz-albumviewer-web"
+      "value": "sk-albumviewer-web"
     },
     "sqlServerName": {
-      "value": "kiz-albumviewer-sql"
+      "value": "sk-albumviewer-sql"
     },
     "sqlDatabaseName": {
-      "value": "kiz-albumviewer-db"
+      "value": "sk-albumviewer-db"
     },
     "applicationInsightsName": {
-      "value": "kiz-albumviewer-insights"
+      "value": "sk-albumviewer-insights"
     },
     "logAnalyticsWorkspaceName": {
-      "value": "kiz-albumviewer-logs"
+      "value": "sk-albumviewer-logs"
     },
     "sqlAdminUsername": {
-      "value": "albumadmin"
+      "value": ""
     },
     "sqlAdminPassword": {
-      "value": "AlbumDemo123!"
+      "value": ""
     },
     "albumManagedIdentity": {
-      "value": "kiz-albumviewer-udmi"
+      "value": "sk-albumviewer-udmi"
     },
     "enableAzureADAuth": {
       "value": false
     },
     "azureADAdminLogin": {
-      "value": "makizhne_microsoft.com#EXT#@fdpo.onmicrosoft.com"
+      "value": ""
     },
     "azureADAdminObjectId": {
-      "value": "b9ce58c2-3ee3-46aa-923e-2c3ddf78bcfa"
+      "value": ""
     }
   }
 }

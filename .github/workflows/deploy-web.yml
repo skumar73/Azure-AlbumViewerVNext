@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 env:
-  WEB_APP_NAME: kiz-albumviewer-web
-  AZURE_RESOURCE_GROUP: kiz-albumviewer-rg
+  WEB_APP_NAME: sk-albumviewer-web
+  AZURE_RESOURCE_GROUP: sk-albumviewer-rg
   WEB_PROJECT_PATH: src/AlbumViewerAngular
 
 jobs:

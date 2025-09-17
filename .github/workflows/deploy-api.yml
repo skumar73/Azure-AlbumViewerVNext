@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  API_APP_NAME: kiz-albumviewer-api
+  API_APP_NAME: sk-albumviewer-api
   API_PROJECT_PATH: src/AlbumViewerNetCore/AlbumViewerNetCore.csproj
 
 jobs:

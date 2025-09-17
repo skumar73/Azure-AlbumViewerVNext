@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_RESOURCE_GROUP: kiz-albumviewer-rg
+  AZURE_RESOURCE_GROUP: sk-albumviewer-rg
   AZURE_LOCATION: eastus2
 
 jobs:
@@ -31,6 +31,10 @@ jobs:
             --location ${{ env.AZURE_LOCATION }} \
             --template-file infra/main.bicep \
             --parameters @infra/parameters.json \
+            --parameters sqlAdminUsername="${{ secrets.SQL_ADMIN_USERNAME }}" \
+            --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" \
+            --parameters azureADAdminLogin="${{ secrets.AZURE_AD_ADMIN_LOGIN }}" \
+            --parameters azureADAdminObjectId="${{ secrets.AZURE_AD_ADMIN_OBJECT_ID }}" \
             --query 'properties.outputs' \
             --output json > outputs.json
 
@@ -50,7 +54,7 @@ jobs:
           API_APP_NAME=$(cat outputs.json | jq -r '.apiAppName.value')
           SQL_SERVER=$(cat outputs.json | jq -r '.sqlServerFqdn.value')
           SQL_DB=$(jq -r '.sqlDatabaseName.value' outputs.json)
-          SQL_CONN_STRING="Server=tcp:$SQL_SERVER,1433;Database=$SQL_DB;User ID=albumadmin;Password=AlbumDemo123!;Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;"
+          SQL_CONN_STRING="Server=tcp:$SQL_SERVER,1433;Database=$SQL_DB;User ID=${{ secrets.SQL_ADMIN_USERNAME }};Password=${{ secrets.SQL_ADMIN_PASSWORD }};Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;"
           echo "Setting Data__SqlServerConnectionString to: $SQL_CONN_STRING"
           az webapp config appsettings set \
             --name "$API_APP_NAME" \
